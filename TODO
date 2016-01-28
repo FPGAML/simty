@@ -1,0 +1,74 @@
+Now
+x Banked mem in collect
+x nmpc branch vs nmpc mem
+x mem writeback
+x Simple coalescing. Leader: binary or 1-hot?
+x Sort out stage 7 mess, rebalance pipeline
+- Sub-word load/stores
+x System insns: read CSR hartid
+- Convert coalescer, scratchpad to Bus_Request interfaces
+- External bus, Scratchpad enable, memory mux stub
+- External insn mem
+x Init phase / running signal
+- ghdl makefile
+- Setup assembler, test bench, bram init
+x Cleaner collect stage: conflict detection, inner banked mem component
+x Insn buffer + scheduler
+x Scheduler scoreboarding, wait for pending loads
+x NMPC bypasses NMPC early, clean front-end
+x Convergence tracker surgery -> open-heart plug-in of convergence_tracker
+x HCT/CCT bypass
+
+Check timing
+- ST -> LD
+- non-POR: back-to-back int: bypass data
+
+Alternative
+- Shorter replay (non-atomic bank conflicts, unaligned)
+x HCT + sorted CCT
+
+Refactoring
+- Cleanup, split into blocks for clustering: front-end, mem-access
+- Self-init, enable, ready signals
+
+Optimization
+- Flatten instruction buffer ram
+- Parallel CCS
+
+Later
+- Call stack depth counter, SP:PC arbitration
+- Memory mux: mmio, dram, cache...
+- Memory FIFO/MSHR
+- VGA controller
+x Insn mem initialization, compiler toolchain
+- CTA sequencer -> system software
+- Proper Imem/Icache
+- Unaligned access, illegal instruction -> trap
+- Traps!
+- Icache
+- Front-end scheduler / Less Dumb Branch Predictor
+- Other CSRs
+- PMU
+
+Options
+- Atomics RV32A
+- Mul/Div RV32M
+- FPU RV32WTF
+- Reduction
+- Message passing / warp-synchronous
+- Complete FP accumulation support
+- SP:PC hashing for approx arbitration, circular comparators??
+
+Much later
+- Multiple clusters
+- TLBs
+- System insn, interrupts
+- Boot Linux
+- Scalarization
+- BFP / Bint
+- SBI / SWI
+
+Never
+- No Warp spawn interrupt/set mask instruction, (vector) interrupts only
+- No Barrier instruction, atomics for s/w impl
+
