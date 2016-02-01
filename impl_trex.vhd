@@ -27,7 +27,7 @@ architecture structural of Impl_TREX is
 	signal pu_request : Bus_Request;
 	signal pu_response : Bus_Response;
 
-	signal vga_locked : std_logic;
+	--signal vga_locked : std_logic;
 
 	signal vga_pixel_cnt : std_logic_vector(10 downto 0);
 	signal vga_line_cnt  : std_logic_vector(10 downto 0);
@@ -90,7 +90,7 @@ begin
                blank_l    => vga_blank_l_g,
                hsync      => vga_hsync_g,
                vsync      => vga_vsync_g,
-               locked     => vga_locked );
+               locked     => open );
 
   vga_out_0 : vga_out
     port map ( clk => vga_clock,

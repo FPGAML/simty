@@ -49,9 +49,9 @@ begin
 	-- Sign- or Zero-extend on sub-word access
 	broadcast_word(15 downto 8) <= (others => broadcast_word(7) and sign_extend) when insn_in.mem_size(1 downto 0) = "00" else
 	                               broadcast_word_mux0(15 downto 8);
-	broadcast_word(31 downto 15) <= (others => broadcast_word_mux0(15) and sign_extend) when insn_in.mem_size(1 downto 0) = "01" else
+	broadcast_word(31 downto 16) <= (others => broadcast_word_mux0(15) and sign_extend) when insn_in.mem_size(1 downto 0) = "01" else
 	                                (others => broadcast_word(7) and sign_extend) when insn_in.mem_size(1 downto 0) = "00" else
-	                                broadcast_word_raw(31 downto 15);
+	                                broadcast_word_raw(31 downto 16);
 
 	data_mux: for i in 0 to warpsize - 1 generate
 		memwriteback_0((i+1)*32-1 downto i*32) <=

@@ -8,7 +8,7 @@ x Sub-word load/stores
 x System insns: read CSR hartid
 x Convert coalescer, scratchpad to Bus_Request interfaces
 x External bus, Scratchpad enable, memory mux stub
-- External insn mem
+x External insn mem
 x Init phase / running signal
 x ghdl makefile
 x Setup assembler, test bench, bram init
@@ -30,16 +30,18 @@ x HCT + sorted CCT
 Refactoring
 - Cleanup, split into blocks for clustering: front-end, mem-access
 - Self-init, enable, ready signals
+- Separate component libraries for simulation / synthesis
+- Separate package parameters
 
 Optimization
 - Flatten instruction buffer ram
 - Parallel CCS
 
 Later
-- Call stack depth counter, SP:PC arbitration
+x Call stack depth counter, SP:PC arbitration
 - Memory mux: mmio, dram, cache...
 - Memory FIFO/MSHR
-- VGA controller
+x VGA controller
 x Insn mem initialization, compiler toolchain
 - Proper Imem/Icache
 - Unaligned access, illegal instruction -> trap

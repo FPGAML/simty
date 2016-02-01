@@ -57,13 +57,13 @@ begin
 	v <= c xor n;
 	z <= '1' when r_add = (31 downto 0 => '0') else '0';
 	with insn.compop select
-		cond_alu <= z          when EQ,
-		        not z      when NE,
-		        n xnor c   when LTU,
-		        n          when LT,
-		        (not n) or z  when GE,
-		        (n xor c) or z when GEU,
-		        '0'        when others;
+		cond_alu <= z        when EQ,
+		        not z        when NE,
+		        v            when LTU,
+		        n            when LT,
+		        (not n) or z when GE,
+		        (not v) or z when GEU,
+		        '0'          when others;
 	
 	r_bool <= X"0000_0001" when cond_alu = '1' else (others => '0');
 	cond <= cond_alu;
