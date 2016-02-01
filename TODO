@@ -4,14 +4,14 @@ x nmpc branch vs nmpc mem
 x mem writeback
 x Simple coalescing. Leader: binary or 1-hot?
 x Sort out stage 7 mess, rebalance pipeline
-- Sub-word load/stores
+x Sub-word load/stores
 x System insns: read CSR hartid
-- Convert coalescer, scratchpad to Bus_Request interfaces
-- External bus, Scratchpad enable, memory mux stub
+x Convert coalescer, scratchpad to Bus_Request interfaces
+x External bus, Scratchpad enable, memory mux stub
 - External insn mem
 x Init phase / running signal
-- ghdl makefile
-- Setup assembler, test bench, bram init
+x ghdl makefile
+x Setup assembler, test bench, bram init
 x Cleaner collect stage: conflict detection, inner banked mem component
 x Insn buffer + scheduler
 x Scheduler scoreboarding, wait for pending loads
@@ -41,7 +41,6 @@ Later
 - Memory FIFO/MSHR
 - VGA controller
 x Insn mem initialization, compiler toolchain
-- CTA sequencer -> system software
 - Proper Imem/Icache
 - Unaligned access, illegal instruction -> trap
 - Traps!
@@ -49,6 +48,12 @@ x Insn mem initialization, compiler toolchain
 - Front-end scheduler / Less Dumb Branch Predictor
 - Other CSRs
 - PMU
+
+Software
+- Minimal bootloader
+- Mandelbrot generator
+- CTA sequencer -> system software
+
 
 Options
 - Atomics RV32A
