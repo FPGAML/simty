@@ -181,26 +181,6 @@ package simty_pkg is
 			b_wr_byteenable : in std_logic_vector(3 downto 0)
 		);
 	end component;
-	component SRAM32_dp_portable is
-		generic (
-			logdepth : positive := 7
-		);
-		port (
-			a_clock : in std_logic;
-			a_address : in unsigned(logdepth - 1 downto 0);
-			a_rd_data : out std_logic_vector(32 - 1 downto 0);
-			a_wr_enable : in std_logic;
-			a_wr_data : in std_logic_vector(32 - 1 downto 0);
-			a_wr_byteenable : in std_logic_vector(3 downto 0);
-		
-			b_clock : in std_logic;
-			b_address : in unsigned(logdepth - 1 downto 0);
-			b_rd_data : out std_logic_vector(32 - 1 downto 0);
-			b_wr_enable : in std_logic;
-			b_wr_data : in std_logic_vector(32 - 1 downto 0);
-			b_wr_byteenable : in std_logic_vector(3 downto 0)
-		);
-	end component;
 
 	component Funnel_Shifter is
 		port (

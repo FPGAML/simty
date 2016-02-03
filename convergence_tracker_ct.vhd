@@ -212,3 +212,11 @@ begin
 		);
 	
 end architecture;
+
+configuration defaultconf of Convergence_Tracker_CT is
+	for structural
+		for all : Context_Compact_Sort
+			use entity work.Context_Compact_Sort(behavioral);
+		end for;
+	end for;
+end configuration;

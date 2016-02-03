@@ -33,7 +33,7 @@ begin
 	-- Instanciate warpsize x 32-wide banks of 16K/warpsize entries each
 	banks: for i in 0 to warpsize - 1 generate
 		actual_write_mask(i) <= valid_in_range and pu_request.is_write and pu_request.write_mask(i);
-		bank_i: SRAM32_dp_portable
+		bank_i: SRAM32_dp
 			generic map (logdepth => bank_logdepth)
 			port map (
 				a_clock => pu_clock,

@@ -3,7 +3,7 @@ PROG=simty_test
 VCD=$(addsuffix .vcd,$(PROG))
 
 # Order matters
-SRC=simty_pkg.vhd sram.vhd ffs.vhd csr.vhd branch_arbiter.vhd  crossbar.vhd banked_rf.vhd fetch_steering.vhd \
+SRC=simty_pkg.vhd sram.vhd targetdep_sim.vhd ffs.vhd csr.vhd branch_arbiter.vhd  crossbar.vhd banked_rf.vhd fetch_steering.vhd \
 	memory_arbiter.vhd funnel_shifter.vhd salu.vhd      branch.vhd          decode.vhd    fetch.vhd \
 	predecode.vhd       schedule.vhd    collect.vhd         execute.vhd   membership.vhd      replay.vhd \
 	scratchpad.vhd load_fifo.vhd coalescing.vhd gather.vhd initialize.vhd convergence_tracker.vhd \

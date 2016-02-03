@@ -108,6 +108,11 @@ set_global_assignment -name SYNTH_TIMING_DRIVEN_SYNTHESIS OFF
 set_global_assignment -name STATE_MACHINE_PROCESSING AUTO
 set_global_assignment -name AUTO_RAM_TO_LCELL_CONVERSION OFF
 set_global_assignment -name ALLOW_ANY_RAM_SIZE_FOR_RECOGNITION ON
+set_global_assignment -name ADD_PASS_THROUGH_LOGIC_TO_INFERRED_RAMS OFF
+set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
+set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
+set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
+set_global_assignment -name VHDL_FILE ../targetdep_altera.vhd
 set_global_assignment -name VHDL_FILE ../graphics_memory.vhd
 set_global_assignment -name VHDL_FILE ../vga_out.vhd
 set_global_assignment -name VHDL_FILE ../util.vhd
@@ -146,8 +151,4 @@ set_global_assignment -name VHDL_FILE ../decode.vhd
 set_global_assignment -name VHDL_FILE ../collect.vhd
 set_global_assignment -name VHDL_FILE ../branch_arbiter.vhd
 set_global_assignment -name SDC_FILE Simty.sdc
-set_global_assignment -name ADD_PASS_THROUGH_LOGIC_TO_INFERRED_RAMS OFF
-set_global_assignment -name PARTITION_NETLIST_TYPE SOURCE -section_id Top
-set_global_assignment -name PARTITION_FITTER_PRESERVATION_LEVEL PLACEMENT_AND_ROUTING -section_id Top
-set_global_assignment -name PARTITION_COLOR 16764057 -section_id Top
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
