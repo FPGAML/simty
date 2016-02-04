@@ -399,23 +399,19 @@ package simty_pkg is
 		port (
 			clock : in std_logic;
 			reset : in std_logic;
-			mpc_in : in code_address;
 			wid_in : in warpid;
 			insn_in : in decoded_instruction;
 			vector_branch_target : in code_address_vector;
 			fallthrough_pc : in code_address;
 
+			context_in : in Path;
 			condition : in mask;
-			valid_mask : in mask;
-			alive_mask_in : in mask;
 			leader : in laneid;
-			calldepth_in : in calldepth_count;
 		
 			default_npc : out code_address;
 			taken_replay_npc : out code_address;
 			taken_replay_mask : out mask;
 		
-			alive_mask_out : out mask;
 			taken_replay_calldepth : out calldepth_count;
 			default_calldepth : out calldepth_count;
 			insn_out : out decoded_instruction;
@@ -631,13 +627,10 @@ package simty_pkg is
 			insn_6 : in decoded_instruction;
 
 			-- Output to Writeback/Branch/Coalescing
+			context_7 : out Path;
 			--pcs_7 : out code_address_vector;	-- To BU (for now)
-			alive_mask_7 : out mask;
-
-			active_mask_7_out : out mask;
 			leader_7 : out laneid;
 			leader_mask_7 : out mask;
-			calldepth_7 : out calldepth_count;
 		
 			-- Feedback from Branch/Coalescing units
 			wid_8 : in warpid;
@@ -646,7 +639,6 @@ package simty_pkg is
 			memory_replay_mask_8 : in mask;	-- From coalescer
 		
 			--nextpcs_8 : in code_address_vector;	-- From BU (for now)
-			alive_mask_8 : in mask;
 		
 			is_branch_8 : in std_logic;
 			branch_default_npc_8 : in code_address;
@@ -660,9 +652,10 @@ package simty_pkg is
 			--fallthrough_pc_8 : in code_address;
 		
 			-- Feedback to Front-end
-			nmpc_8 : out code_address;
-			nmpc_alive_8 : out std_logic;
-			nmpc_valid_8 : out std_logic;
+			nmpc : out code_address;
+			nmpc_alive : out std_logic;
+			nmpc_valid : out std_logic;
+			nmpc_wid : out warpid;
 		
 			-- Init interface
 			init : in std_logic;
@@ -715,18 +708,14 @@ package simty_pkg is
 			insn_6 : in decoded_instruction;
 
 			-- Output to Writeback/Branch/Coalescing
-			alive_mask_7 : out mask;
-			active_mask_7_out : out mask;
+			context_7 : out Path;
 			leader_7 : out laneid;
 			leader_mask_7 : out mask;
-			calldepth_7 : out calldepth_count;
 		
 			-- Feedback from Branch/Coalescing units
 			wid_8 : in warpid;
 			is_mem_8 : in std_logic;
 			memory_replay_mask_8 : in mask;	-- From coalescer
-		
-			alive_mask_8 : in mask;
 		
 			is_branch_8 : in std_logic;	-- From BU
 			branch_default_npc_8 : in code_address;

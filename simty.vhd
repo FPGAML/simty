@@ -47,20 +47,16 @@ architecture structural of Simty is
 	signal d_7 : vector;
 	signal cond_7 : mask;
 	signal indirect_target_7 : code_address_vector;
-	--signal pcs_7 : code_address_vector;
-	signal pcs_invalid_7, pcs_invalid_8 : std_logic;
-	signal alive_mask_7, alive_mask_7b, alive_mask_8 : mask;
-	signal active_mask_7 : mask;
+	signal context_7 : Path;
 	signal leader_7 : laneid;
 	signal leader_mask_7 : mask;
 	signal writeback_mask_7 : mask;
 	signal fallthrough_pc_7 : code_address;
-	--signal nextpcs_7, nextpcs_8 : code_address_vector;
 
 	signal branch_default_npc_8 : code_address;
 	signal branch_taken_replay_npc_8 : code_address;
 	signal branch_taken_replay_mask_8 : mask;
-	signal calldepth_7, branch_taken_replay_calldepth_8, branch_default_calldepth_8 : calldepth_count;
+	signal branch_taken_replay_calldepth_8, branch_default_calldepth_8 : calldepth_count;
 	signal nmpc : code_address;
 	signal nmpc_alive : std_logic;
 	signal nmpc_valid : std_logic;
@@ -267,18 +263,16 @@ begin
 			wid_6 => wid_6,
 			insn_6 => insn_6,
 			-- Outputs stage 7
+			context_7 => context_7,
 			--pcs_7 => pcs_7,
-			alive_mask_7 => alive_mask_7,
-			active_mask_7_out => active_mask_7,
 			leader_7 => leader_7,
 			leader_mask_7 => leader_mask_7,
-			calldepth_7 => calldepth_7,
 			-- Input stage 8
 			wid_8 => wid_8,
 			is_mem_8 => is_mem_8,
 			memory_replay_mask_8 => replay_mask_8,
 			--nextpcs_8 => nextpcs_8,
-			alive_mask_8 => alive_mask_8,
+			--alive_mask_8 => alive_mask_8,
 			is_branch_8 => is_branch_8,
 			branch_default_npc_8 => branch_default_npc_8,
 			branch_default_calldepth_8 => branch_default_calldepth_8,
@@ -297,7 +291,7 @@ begin
 			init_nextwid => init_nextwid
 		);
 	
-	writeback_mask_7 <= active_mask_7 when insn_7.writeback_d = '1' else (others => '0');
+	writeback_mask_7 <= context_7.vmask when insn_7.writeback_d = '1' else (others => '0');
 	
 	-- Stage 7
 	-- Assumes Branch and Coalescing have the same latency
@@ -305,22 +299,20 @@ begin
 		port map (
 			clock => clock,
 			reset => reset,
-			mpc_in => mpc_7,
+			--mpc_in => mpc_7,
 			wid_in => wid_7,
 			insn_in => insn_7,
 			vector_branch_target => indirect_target_7,
 			fallthrough_pc => fallthrough_pc_7,
+			context_in => context_7,
 			--pcs => pcs_7,
 			condition => cond_7,
-			valid_mask => active_mask_7,
-			alive_mask_in => alive_mask_7,
 			leader => leader_7,
-			calldepth_in => calldepth_7,
 			--nextpcs => nextpcs_8,
 			default_npc => branch_default_npc_8,
 			taken_replay_npc => branch_taken_replay_npc_8,
 			taken_replay_mask => branch_taken_replay_mask_8,
-			alive_mask_out => alive_mask_8,
+			--alive_mask_out => alive_mask_8,
 			taken_replay_calldepth => branch_taken_replay_calldepth_8,
 			default_calldepth => branch_default_calldepth_8,
 			insn_out => insn_8,
@@ -334,7 +326,7 @@ begin
 			mpc_in => mpc_7,
 			wid_in => wid_7,
 			insn_in => insn_7,
-			valid_mask => active_mask_7,
+			valid_mask => context_7.vmask,
 			leader => leader_7,
 			leader_mask => leader_mask_7,
 			--invalid => invalid_7,

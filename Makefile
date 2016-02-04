@@ -16,7 +16,7 @@ sim: $(VCD)
 
 #$(OBJ): $(SRC)
 %.o: %.vhd
-	$(GHDL) -a --std=08 $<
+	$(GHDL) -a --std=08 --warn-unused $<
 
 $(PROG): $(OBJ)
 	$(GHDL) -e --std=08 Simty_Test

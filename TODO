@@ -28,6 +28,7 @@ Alternative
 x HCT + sorted CCT
 
 Refactoring
+- Path type everywhere: CT->Branch, Branch->CT
 - Cleanup, split into blocks for clustering: front-end, mem-access
 - Self-init, enable, ready signals
 - Separate component libraries for simulation / synthesis
@@ -35,7 +36,7 @@ Refactoring
 
 Optimization
 - Flatten instruction buffer ram
-- Parallel CCS
+x Parallel CCS
 
 Later
 x Call stack depth counter, SP:PC arbitration
@@ -65,6 +66,7 @@ Options
 - Message passing / warp-synchronous
 - Complete FP accumulation support
 - SP:PC hashing for approx arbitration, circular comparators??
+- Scheduling policies: unfair oldest, random
 
 Much later
 - Multiple clusters

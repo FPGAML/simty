@@ -9,7 +9,7 @@ entity Branch is
 	port (
 		clock : in std_logic;
 		reset : in std_logic;
-		mpc_in : in code_address;
+		--mpc_in : in code_address;
 		wid_in : in warpid;
 		insn_in : in decoded_instruction;
 		vector_branch_target : in code_address_vector;
@@ -17,11 +17,12 @@ entity Branch is
 
 		--pcs : in code_address_vector;
 
+		context_in : in Path;
 		condition : in mask;
-		valid_mask : in mask;
-		alive_mask_in : in mask;
+		--valid_mask : in mask;
+		--alive_mask_in : in mask;
 		leader : in laneid;
-		calldepth_in : in calldepth_count;
+		--calldepth_in : in calldepth_count;
 		
 		default_npc : out code_address;
 		taken_replay_npc : out code_address;
@@ -30,7 +31,7 @@ entity Branch is
 		
 		--replay_mask : in mask;	-- From MA
 		
-		alive_mask_out : out mask;
+		--alive_mask_out : out mask;
 		taken_replay_calldepth : out calldepth_count;
 		default_calldepth : out calldepth_count;
 		insn_out : out decoded_instruction;
@@ -40,22 +41,25 @@ entity Branch is
 end entity;
 
 architecture structural of Branch is
-	signal scalar_branch_target_0 : code_address;
-	signal taken_mask_0 : mask;
+	signal mpc_0, scalar_branch_target_0 : code_address;
+	signal valid_mask, taken_mask_0 : mask;
 	signal leader_target_0 : code_address;
 	signal uniform_mask_0, replay_mask_0 : mask;
 	
 	signal default_npc_0, taken_replay_npc_0 : code_address;
 	signal taken_replay_mask_0 : mask;
-	signal default_calldepth_0, taken_replay_calldepth_0 : calldepth_count;
+	signal calldepth_0, default_calldepth_0, taken_replay_calldepth_0 : calldepth_count;
 begin
+	valid_mask <= context_in.vmask;
+	mpc_0 <= context_in.mpc;
+	calldepth_0 <= context_in.calldepth;
+	
 	-- Vector branch target from ALU for:
 	-- JALR: S1 + I-Imm (vector)
 	-- Compute scalar branch target here for:
 	-- JAL:  PC + J-Imm
 	-- Bxx:  PC + B-Imm
-	scalar_branch_target_0 <= std_logic_vector(unsigned(mpc_in) + unsigned(insn_in.imm(code_address'high downto 2)));
-
+	scalar_branch_target_0 <= std_logic_vector(unsigned(mpc_0) + unsigned(insn_in.imm(code_address'high downto 2)));
 	-- Serialize indirect branches
 	leader_target_0 <= vector_branch_target(to_integer(unsigned(leader)));
 	
@@ -78,22 +82,22 @@ begin
 	
 	with insn_in.branchop select
 		taken_replay_npc_0 <= scalar_branch_target_0 when BCC | JAL,
-		                      mpc_in                 when others;
+		                      mpc_0                  when others;
 
 	-- Call/return
 	-- JALR w/ rd=x1 -> push
 	-- JALR w/ rd=x0, rs=x1 -> pop
-	default_calldepth_0 <= calldepth_count(unsigned(calldepth_in) + 1) when insn_in.branchop = JALR and insn_in.rd = "00001" else
-	                       calldepth_count(unsigned(calldepth_in) - 1) when insn_in.branchop = JALR and insn_in.rd = "00000" and insn_in.rs1 = "00001" else
-	                       calldepth_in;
-	taken_replay_calldepth_0 <= calldepth_in;	-- No change
+	default_calldepth_0 <= calldepth_count(unsigned(calldepth_0) + 1) when insn_in.branchop = JALR and insn_in.rd = "00001" else
+	                       calldepth_count(unsigned(calldepth_0) - 1) when insn_in.branchop = JALR and insn_in.rd = "00000" and insn_in.rs1 = "00001" else
+	                       calldepth_0;
+	taken_replay_calldepth_0 <= calldepth_0;	-- No change
 	
 	process(clock)
 	begin
 		if rising_edge(clock) then
 			if reset = '1' then
 				wid_out <= (others => '0');
-				alive_mask_out <= (others => '1');	-- Set alive all warp 0 threads
+				--alive_mask_out <= (others => '1');	-- Set alive all warp 0 threads
 				default_npc <= DummyPC;
 				taken_replay_npc <= DummyPC;
 				taken_replay_mask <= (others => '0');
@@ -102,7 +106,7 @@ begin
 				insn_out <= NopDec;
 			else
 				wid_out <= wid_in;
-				alive_mask_out <= alive_mask_in;	-- no kill/spawn instruction yet (or ever?)
+				--alive_mask_out <= alive_mask_in;	-- no kill/spawn instruction yet (or ever?)
 				default_npc <= default_npc_0;
 				taken_replay_npc <= taken_replay_npc_0;
 				taken_replay_mask <= taken_replay_mask_0;

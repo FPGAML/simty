@@ -18,13 +18,14 @@ entity Convergence_Tracker is
 		insn_6 : in decoded_instruction;
 
 		-- Output to Writeback/Branch/Coalescing
+		context_7 : out Path;
 		--pcs_7 : out code_address_vector;	-- To BU (for now)
-		alive_mask_7 : out mask;
+		--alive_mask_7 : out mask;
 
-		active_mask_7_out : out mask;
+		--active_mask_7_out : out mask;
 		leader_7 : out laneid;
 		leader_mask_7 : out mask;
-		calldepth_7 : out calldepth_count;
+		--calldepth_7 : out calldepth_count;
 		
 		
 		-- Feedback from Branch/Coalescing units
@@ -34,7 +35,7 @@ entity Convergence_Tracker is
 		memory_replay_mask_8 : in mask;	-- From coalescer
 		
 		--nextpcs_8 : in code_address_vector;	-- From BU (for now)
-		alive_mask_8 : in mask;
+		--alive_mask_8 : in mask;
 		
 		is_branch_8 : in std_logic;	-- From BU
 		branch_default_npc_8 : in code_address;
@@ -61,7 +62,7 @@ architecture structural of Convergence_Tracker is
 	signal nmpc_branch_7, nmpc_branch_8 : code_address;
 	signal pcs_invalid_7, pcs_invalid_8 : std_logic;
 	signal mshp_nextpcs : code_address_vector;
-	signal mshp_alive_mask : mask;
+	signal mshp_alive_mask, alive_mask_8 : mask;
 	signal mshp_nextwid : warpid;
 	signal mshp_pcs_invalid : std_logic;
 	signal pcs_7, pcs_8 : code_address_vector;
@@ -98,6 +99,8 @@ begin
 			wid_out => nextwid_8
 		);
 
+	alive_mask_8 <= (others => '1');
+
 	mshp_nextpcs <= init_nextpcs when init = '1' else nextpcs_8b;
 	mshp_nextwid <= init_nextwid when init = '1' else nextwid_8;
 	mshp_alive_mask <= init_alive_mask when init = '1' else alive_mask_8;
@@ -110,7 +113,7 @@ begin
 			wid_in => wid_6,
 			insn_in => insn_6,
 			pcs => pcs_7,
-			alive => alive_mask_7,
+			alive => open,
 			valid_mask => active_mask_7,
 			leader => leader_7,
 			leader_mask => leader_mask_7,
@@ -120,8 +123,11 @@ begin
 			nextalive => mshp_alive_mask,
 			nextpcs_invalid => mshp_pcs_invalid
 		);
-	active_mask_7_out <= active_mask_7;
-	calldepth_7 <= (others => '0');	-- Placeholder!
+
+	context_7.valid <= '1';
+	context_7.mpc <= mpc_7;
+	context_7.vmask <= active_mask_7;
+	context_7.calldepth <= (others => '0');	-- Placeholder!
 	-- TODO: get calldepths from membership, expose calldepths(leader), update calldepths, feed back to membership, pass to branch arbiter
 	
 	

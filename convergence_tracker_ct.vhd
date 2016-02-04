@@ -19,18 +19,19 @@ entity Convergence_Tracker_CT is
 		insn_6 : in decoded_instruction;
 
 		-- Output to Writeback/Branch/Coalescing
-		alive_mask_7 : out mask;
-		active_mask_7_out : out mask;
+		context_7 : out Path;
+		--alive_mask_7 : out mask;
+		--active_mask_7_out : out mask;
 		leader_7 : out laneid;
 		leader_mask_7 : out mask;
-		calldepth_7 : out calldepth_count;
+		--calldepth_7 : out calldepth_count;
 		
 		-- Feedback from Branch/Coalescing units
 		wid_8 : in warpid;
 		is_mem_8 : in std_logic;
 		memory_replay_mask_8 : in mask;	-- From coalescer
 		
-		alive_mask_8 : in mask;
+		--alive_mask_8 : in mask;
 		
 		is_branch_8 : in std_logic;	-- From BU
 		branch_default_npc_8 : in code_address;
@@ -96,8 +97,10 @@ begin
 	invalid_7 <= '1' when x_7.mpc /= mpc_7 else not x_7.valid;
 	-- Do not commit any state when invalid = '1' !
 	active_mask_7 <= EmptyMask when invalid_7 = '1' else x_7.vmask;
-	active_mask_7_out <= active_mask_7;
-	calldepth_7 <= x_7.calldepth;
+	context_7.valid <= not invalid_7;
+	context_7.vmask <= active_mask_7;
+	context_7.calldepth <= x_7.calldepth;
+	context_7.mpc <= mpc_7;
 	-- Compute Leader
 	-- Priority encoder to elect leader: find first set
 	elect_leader : FFS
@@ -107,8 +110,6 @@ begin
 			fs => leader_7,
 			zero => open,
 			one_hot => leader_mask_7);
-
-	alive_mask_7 <= (others => '1');	-- Placeholder: not actually used
 
 	-- Read c_8 from HCT2, 6->7 or 7->8, with bypass from y_9
 	
