@@ -9,31 +9,17 @@ entity Branch is
 	port (
 		clock : in std_logic;
 		reset : in std_logic;
-		--mpc_in : in code_address;
 		wid_in : in warpid;
 		insn_in : in decoded_instruction;
 		vector_branch_target : in code_address_vector;
 		fallthrough_pc : in code_address;
 
-		--pcs : in code_address_vector;
-
 		context_in : in Path;
 		condition : in mask;
-		--valid_mask : in mask;
-		--alive_mask_in : in mask;
 		leader : in laneid;
-		--calldepth_in : in calldepth_count;
 		
-		default_npc : out code_address;
-		taken_replay_npc : out code_address;
-		taken_replay_mask : out mask;
-		--nextpcs : out code_address_vector;	-- To MSHP
-		
-		--replay_mask : in mask;	-- From MA
-		
-		--alive_mask_out : out mask;
-		taken_replay_calldepth : out calldepth_count;
-		default_calldepth : out calldepth_count;
+		default_context : out Path;
+		taken_replay_context : out Path;
 		insn_out : out decoded_instruction;
 		--mpc_out : out address;
 		wid_out : out warpid
@@ -49,6 +35,7 @@ architecture structural of Branch is
 	signal default_npc_0, taken_replay_npc_0 : code_address;
 	signal taken_replay_mask_0 : mask;
 	signal calldepth_0, default_calldepth_0, taken_replay_calldepth_0 : calldepth_count;
+	signal nonetaken_0, alltaken_0 : std_logic;
 begin
 	valid_mask <= context_in.vmask;
 	mpc_0 <= context_in.mpc;
@@ -91,27 +78,38 @@ begin
 	                       calldepth_count(unsigned(calldepth_0) - 1) when insn_in.branchop = JALR and insn_in.rd = "00000" and insn_in.rs1 = "00001" else
 	                       calldepth_0;
 	taken_replay_calldepth_0 <= calldepth_0;	-- No change
+
+	nonetaken_0 <= '1' when taken_replay_mask_0 = EmptyMask else '0';
+	alltaken_0 <= '1' when taken_replay_mask_0 = valid_mask else '0';
 	
 	process(clock)
 	begin
 		if rising_edge(clock) then
 			if reset = '1' then
 				wid_out <= (others => '0');
-				--alive_mask_out <= (others => '1');	-- Set alive all warp 0 threads
-				default_npc <= DummyPC;
-				taken_replay_npc <= DummyPC;
-				taken_replay_mask <= (others => '0');
-				default_calldepth <= (others => '0');
-				taken_replay_calldepth <= (others => '0');
+				default_context <= (
+					valid => '0',
+				    mpc => DummyPC,
+				    calldepth => (others => '0'),
+				    vmask => EmptyMask);
+				taken_replay_context <= (
+					valid => '0',
+				    mpc => DummyPC,
+				    calldepth => (others => '0'),
+				    vmask => EmptyMask);
 				insn_out <= NopDec;
 			else
 				wid_out <= wid_in;
-				--alive_mask_out <= alive_mask_in;	-- no kill/spawn instruction yet (or ever?)
-				default_npc <= default_npc_0;
-				taken_replay_npc <= taken_replay_npc_0;
-				taken_replay_mask <= taken_replay_mask_0;
-				default_calldepth <= default_calldepth_0;
-				taken_replay_calldepth <= taken_replay_calldepth_0;
+				default_context <= (
+					valid => not alltaken_0,
+				    mpc => default_npc_0,
+				    calldepth => default_calldepth_0,
+				    vmask => valid_mask and not taken_replay_mask_0);
+				taken_replay_context <= (
+					valid => not nonetaken_0,
+					mpc => taken_replay_npc_0,
+					calldepth => taken_replay_calldepth_0,
+					vmask => taken_replay_mask_0);
 				insn_out <= insn_in;
 			end if;
 		end if;

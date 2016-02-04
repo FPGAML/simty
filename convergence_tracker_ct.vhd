@@ -34,11 +34,8 @@ entity Convergence_Tracker_CT is
 		--alive_mask_8 : in mask;
 		
 		is_branch_8 : in std_logic;	-- From BU
-		branch_default_npc_8 : in code_address;
-		branch_default_calldepth_8 : in calldepth_count;
-		branch_taken_replay_npc_8 : in code_address;
-		branch_taken_replay_mask_8 : in mask;
-		branch_taken_replay_calldepth_8 : in calldepth_count;
+		branch_default_context_8 : in Path;
+		branch_taken_replay_context_8 : in Path;
 		
 		-- Feedback to Front-end
 		nmpc : out code_address;
@@ -58,7 +55,7 @@ architecture structural of Convergence_Tracker_CT is
 	signal active_mask_7, active_mask_8 : mask;
 	signal a_8, b_8, a_branch_8, b_branch_8, a_mem_8, b_mem_8, c_8, x_7, x_8, y_8, z_8, y_9 : Path;
 	signal wid_7, wid_9 : warpid;
-	signal branch_default_mask_8, memory_default_mask_8 : mask;
+	signal memory_default_mask_8 : mask;
 	signal replay_pc_8 : code_address;
 	signal doreplay_8, nonetaken_8, alltaken_8 : std_logic;
 	signal cct_op_8 : CCT_Command;
@@ -116,19 +113,10 @@ begin
 	-- Compute (NPC1, mask1, v1), (NPC2, mask2, v2) stage 8
 	replay_pc_8 <= mpc_8;	-- x_8.mpc is next pc!
 	doreplay_8 <= '1' when memory_replay_mask_8 /= EmptyMask else '0';
-	-- Compute upstream and take as inputs?
-	nonetaken_8 <= '1' when branch_taken_replay_mask_8 = EmptyMask else '0';
-	alltaken_8 <= '1' when branch_taken_replay_mask_8 = active_mask_8 else '0';
 
-	branch_default_mask_8 <= active_mask_8 and not branch_taken_replay_mask_8;
-	a_branch_8 <= (valid => not alltaken_8,
-	               mpc => branch_default_npc_8,
-	               calldepth => branch_default_calldepth_8,
-	               vmask => branch_default_mask_8);
-	b_branch_8 <= (valid => not nonetaken_8,
-	               mpc => branch_taken_replay_npc_8,
-	               calldepth => branch_taken_replay_calldepth_8,
-	               vmask => branch_taken_replay_mask_8);
+	a_branch_8 <= branch_default_context_8;
+	b_branch_8 <= branch_taken_replay_context_8;
+
 	memory_default_mask_8 <= active_mask_8 and not memory_replay_mask_8;
 	a_mem_8 <= (valid => '1',	-- Forward progress: at least 1 thread moves on to next instruction
 	            mpc => fallthrough_pc_8,

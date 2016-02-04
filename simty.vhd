@@ -53,10 +53,7 @@ architecture structural of Simty is
 	signal writeback_mask_7 : mask;
 	signal fallthrough_pc_7 : code_address;
 
-	signal branch_default_npc_8 : code_address;
-	signal branch_taken_replay_npc_8 : code_address;
-	signal branch_taken_replay_mask_8 : mask;
-	signal branch_taken_replay_calldepth_8, branch_default_calldepth_8 : calldepth_count;
+	signal branch_default_context_8, branch_taken_replay_context_8 : Path;
 	signal nmpc : code_address;
 	signal nmpc_alive : std_logic;
 	signal nmpc_valid : std_logic;
@@ -272,13 +269,10 @@ begin
 			is_mem_8 => is_mem_8,
 			memory_replay_mask_8 => replay_mask_8,
 			--nextpcs_8 => nextpcs_8,
-			--alive_mask_8 => alive_mask_8,
 			is_branch_8 => is_branch_8,
-			branch_default_npc_8 => branch_default_npc_8,
-			branch_default_calldepth_8 => branch_default_calldepth_8,
-			branch_taken_replay_npc_8 => branch_taken_replay_npc_8,
-			branch_taken_replay_mask_8 => branch_taken_replay_mask_8,
-			branch_taken_replay_calldepth_8 => branch_taken_replay_calldepth_8,
+			branch_default_context_8 => branch_default_context_8,
+			branch_taken_replay_context_8 => branch_taken_replay_context_8,
+
 			-- Output stage 8 (combinatorial)
 			nmpc => nmpc,
 			nmpc_alive => nmpc_alive,
@@ -309,12 +303,8 @@ begin
 			condition => cond_7,
 			leader => leader_7,
 			--nextpcs => nextpcs_8,
-			default_npc => branch_default_npc_8,
-			taken_replay_npc => branch_taken_replay_npc_8,
-			taken_replay_mask => branch_taken_replay_mask_8,
-			--alive_mask_out => alive_mask_8,
-			taken_replay_calldepth => branch_taken_replay_calldepth_8,
-			default_calldepth => branch_default_calldepth_8,
+			default_context => branch_default_context_8,
+			taken_replay_context => branch_taken_replay_context_8,
 			insn_out => insn_8,
 			wid_out => wid_8
 		);

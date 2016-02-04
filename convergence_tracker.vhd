@@ -38,11 +38,8 @@ entity Convergence_Tracker is
 		--alive_mask_8 : in mask;
 		
 		is_branch_8 : in std_logic;	-- From BU
-		branch_default_npc_8 : in code_address;
-		branch_default_calldepth_8 : in calldepth_count;
-		branch_taken_replay_npc_8 : in code_address;
-		branch_taken_replay_mask_8 : in mask;
-		branch_taken_replay_calldepth_8 : in calldepth_count;
+		branch_default_context_8 : in Path;
+		branch_taken_replay_context_8 : in Path;
 		
 		-- Feedback to Front-end
 		nmpc : out code_address;
@@ -83,8 +80,8 @@ begin
 	
 	npc_mux: for i in 0 to warpsize - 1 generate
 		nextpcs_8(i) <=
-			branch_taken_replay_npc_8 when branch_taken_replay_mask_8(i) = '1' else
-			branch_default_npc_8 when active_mask_8(i) = '1' else
+			branch_taken_replay_context_8.mpc when branch_taken_replay_context_8.vmask(i) = '1' else
+			branch_default_context_8.mpc when active_mask_8(i) = '1' else
 			pcs_8(i);	-- TODO: use write-enable signals
 	end generate;
 	

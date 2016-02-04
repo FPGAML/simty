@@ -408,12 +408,9 @@ package simty_pkg is
 			condition : in mask;
 			leader : in laneid;
 		
-			default_npc : out code_address;
-			taken_replay_npc : out code_address;
-			taken_replay_mask : out mask;
-		
-			taken_replay_calldepth : out calldepth_count;
-			default_calldepth : out calldepth_count;
+			default_context : out Path;
+			taken_replay_context : out Path;
+
 			insn_out : out decoded_instruction;
 			--mpc_out : out address;
 			wid_out : out warpid
@@ -641,15 +638,8 @@ package simty_pkg is
 			--nextpcs_8 : in code_address_vector;	-- From BU (for now)
 		
 			is_branch_8 : in std_logic;
-			branch_default_npc_8 : in code_address;
-			branch_default_calldepth_8 : in calldepth_count;
-			branch_taken_replay_npc_8 : in code_address;
-			branch_taken_replay_mask_8 : in mask;
-			branch_taken_replay_calldepth_8 : in calldepth_count;
-			--branch_taken_mask_8 : in mask;	-- From BU
-			--branch_target_8 : in code_address;
-			--branch_fallthrough_mask_8 : in mask;	-- not taken and not fallthrough -> replay
-			--fallthrough_pc_8 : in code_address;
+			branch_default_context_8 : in Path;
+			branch_taken_replay_context_8 : in Path;
 		
 			-- Feedback to Front-end
 			nmpc : out code_address;
@@ -718,11 +708,8 @@ package simty_pkg is
 			memory_replay_mask_8 : in mask;	-- From coalescer
 		
 			is_branch_8 : in std_logic;	-- From BU
-			branch_default_npc_8 : in code_address;
-			branch_default_calldepth_8 : in calldepth_count;
-			branch_taken_replay_npc_8 : in code_address;
-			branch_taken_replay_mask_8 : in mask;
-			branch_taken_replay_calldepth_8 : in calldepth_count;
+			branch_default_context_8 : in Path;
+			branch_taken_replay_context_8 : in Path;
 		
 			-- Feedback to Front-end
 			nmpc : out code_address;
