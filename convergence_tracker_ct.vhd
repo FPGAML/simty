@@ -59,7 +59,7 @@ architecture structural of Convergence_Tracker_CT is
 	signal replay_pc_8 : code_address;
 	signal doreplay_8, nonetaken_8, alltaken_8 : std_logic;
 	signal cct_op_8 : CCT_Command;
-	signal y_changed_9 : std_logic;
+	signal y_writeback_9 : std_logic;
 	signal hct_x_in_8, hct_y_in_9 : Path;
 	signal hct_x_wid_8, hct_y_wid_9 : warpid;
 	signal hct_x_wren_8, hct_y_wren_9 : std_logic;
@@ -179,7 +179,7 @@ begin
 			z_in => z_8,
 			y_out => y_9,
 			wid_out => wid_9,
-			y_changed => y_changed_9
+			y_writeback => y_writeback_9
 		);
 		
 	-- Writeback y_9 in HCT2
@@ -188,7 +188,7 @@ begin
 	hct_y_in_9.calldepth <= y_9.calldepth;
 	hct_y_in_9.valid <= '0' when init = '1' else y_9.valid;
 	hct_y_wid_9 <= init_nextwid when init = '1' else wid_9;
-	hct_y_wren_9 <= y_changed_9 or init;
+	hct_y_wren_9 <= y_writeback_9 or init;
 	hct_y : Hot_Context_Table
 		port map (
 			clock => clock,

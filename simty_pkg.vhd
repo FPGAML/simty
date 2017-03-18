@@ -664,7 +664,7 @@ package simty_pkg is
 			z_in : in Path;
 			y_out : out Path;
 			wid_out : out warpid;
-			y_changed : out std_logic
+			y_writeback : out std_logic
 		);
 	end component;
 	component Hot_Context_Table is

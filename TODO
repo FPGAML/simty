@@ -18,25 +18,29 @@ x Scheduler scoreboarding, wait for pending loads
 x NMPC bypasses NMPC early, clean front-end
 x Convergence tracker surgery -> open-heart plug-in of convergence_tracker
 x HCT/CCT bypass
+- ECALL
+- ERET
 
 Check timing
 - ST -> LD
 - non-POR: back-to-back int: bypass data
 
 Alternative
-- Shorter replay (non-atomic bank conflicts, unaligned)
+- Shorter replay (non-atomic bank conflicts, unaligned, exception)
 x HCT + sorted CCT
 
 Refactoring
-- Path type everywhere: CT->Branch, Branch->CT
+x Path type everywhere: CT->Branch, Branch->CT
 - Cleanup, split into blocks for clustering: front-end, mem-access
 - Self-init, enable, ready signals
-- Separate component libraries for simulation / synthesis
+x Separate component libraries for simulation / synthesis
 - Separate package parameters
+- CSR out of Execute
 
-Optimization
+RTL optimization
 - Flatten instruction buffer ram
 x Parallel CCS
+- On-the-fly decode using accessors to decoded_instruction
 
 Later
 x Call stack depth counter, SP:PC arbitration
@@ -45,16 +49,22 @@ x Call stack depth counter, SP:PC arbitration
 x VGA controller
 x Insn mem initialization, compiler toolchain
 - Proper Imem/Icache
+- EBREAK
+- Exceptions
+- mstatus, mepc, mscratch CSR
+- Trap priority bit in Path
 - Unaligned access, illegal instruction -> trap
-- Traps!
+- Interrupts
 - Icache
 - Front-end scheduler / Less Dumb Branch Predictor
 - Other CSRs
 - PMU
+- Scoreboarding
 
 Software
 - Minimal bootloader
 - Mandelbrot generator
+- Conway's Game of Life
 - CTA sequencer -> system software
 
 

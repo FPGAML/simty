@@ -293,7 +293,6 @@ begin
 		port map (
 			clock => clock,
 			reset => reset,
-			--mpc_in => mpc_7,
 			wid_in => wid_7,
 			insn_in => insn_7,
 			vector_branch_target => indirect_target_7,
@@ -322,10 +321,6 @@ begin
 			--invalid => invalid_7,
 			vector_address => d_7,
 			store_data_in => s2_7,
-			--address => mem_address_8,
-			--store_data_out => dmem_write_8,
-			--byte_enable => byte_enable_8,
-			--address_valid_mask => write_mask_8,
 			request => request_8,
 			broadcast_mask => broadcast_mask_8,
 			replay_mask => replay_mask_8,
