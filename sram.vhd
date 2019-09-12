@@ -41,10 +41,14 @@ architecture altera of SRAM is
 			--rd_enable : in std_logic;
 			rd_address : in unsigned(logdepth - 1 downto 0);
 			rd_data : out std_logic_vector(32 - 1 downto 0);
+--			rd_data : out std_logic_vector(width - 1 downto 0);
+
 
 			wr_enable : in std_logic;
 			wr_address : in unsigned(logdepth - 1 downto 0);
 			wr_data : in std_logic_vector(32 - 1 downto 0);
+--			wr_data : in std_logic_vector(width - 1 downto 0);
+
 			wr_byteenable : in std_logic_vector(4 - 1 downto 0)
 		);
 	end component;
@@ -59,9 +63,13 @@ begin
 				reset => reset,
 				rd_address => rd_address,
 				rd_data => rd_data(i * 32 + 31 downto i * 32),
+--				rd_data => rd_data(i * width + 31 downto i * width),
+
 				wr_enable => sa_enable(i),
 				wr_address => wr_address,
 				wr_data => wr_data(i * 32 + 31 downto i * 32),
+--				wr_data => wr_data(i * width + 31 downto i * width),
+
 				--wr_byteenable => wr_byteenable(i * 4 + 3 downto i * 4)
 				wr_byteenable => wr_common_byteenable
 			);
@@ -108,10 +116,10 @@ architecture altera of SRAM32we is
 	signal q_local : word_t;
 begin
 	-- Re-organize the read data from the RAM to match the output
-	unpack: for i in 0 to bytes - 1 generate    
+	unpack: for i in 0 to bytes - 1 generate
 		rd_data(8*(i+1) - 1 downto 8*i) <= q_local(i);
 	end generate unpack;
-	
+
 	process(clock)
 	begin
 		if rising_edge(clock) then
@@ -176,7 +184,7 @@ architecture altera of SRAM32 is
 begin
 	process(clock)
 	begin
-		if rising_edge(clock) then 
+		if rising_edge(clock) then
 			--if reset = '1' then
 			--	rd_data <= (others => '0');
 			--else
@@ -188,6 +196,3 @@ begin
 		end if;
 	end process;
 end architecture;
-
-
-

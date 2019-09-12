@@ -20,7 +20,7 @@ entity Fetch is
 		nmpc_valid : in std_logic;
 		nmpc_wid : in warpid;
 		ignorepath : out std_logic;
-		
+
 		-- Interface to Imem/Icache
 		--icache_request_address : out code_address;
 		--icache_request_valid : out std_logic;
@@ -34,7 +34,7 @@ entity Fetch is
 end entity;
 
 architecture structural of Fetch is
-	signal iw_read : instruction_word;
+	--signal iw_read : instruction_word;
 	signal iw_valid : std_logic;
 	signal ignorepath_0 : std_logic;
 begin
@@ -72,7 +72,8 @@ begin
 			end if;
 		end if;
 	end process;
-	
+
+	--iw_read <= icache_resp.data;
 	iw <= icache_resp.data;
 	valid <= icache_resp.valid;
 	mpc_out <= icache_resp.address;

@@ -9,20 +9,20 @@ entity Banked_RF is
 	port (
 		clock : in std_logic;
 		reset : in std_logic;
-		
+
 		-- Read ports a, b
 		-- a has the priority: always succeed
 		a_valid : in std_logic;
 		a_addr : in rfbank_address;
 		a_bank : in std_logic;
 		a_data : out vector;
-		
+
 		b_valid : in std_logic;
 		b_addr : in rfbank_address;
 		b_bank : in std_logic;
 		b_data : out vector;
 		b_conflict : out std_logic;
-		
+
 		-- Write ports x, y
 		-- x has the priority
 		x_valid : in std_logic;
@@ -30,7 +30,7 @@ entity Banked_RF is
 		x_bank : in std_logic;
 		x_data : in vector;
 		x_wordenable : in mask;
-		
+
 		y_valid : in std_logic;
 		y_addr : in rfbank_address;
 		y_bank : in std_logic;
@@ -51,34 +51,34 @@ architecture structural of Banked_RF is
 	signal bank0_wrdata, bank1_wrdata : vector;
 	signal bank0_wren, bank1_wren : std_logic;
 	signal bank0_wordenable, bank1_wordenable : std_logic_vector(warpsize - 1 downto 0);
-	
+
 	signal bank0_rmux : std_logic;	-- 0: read from a, 1: read from b
 	signal bank1_rmux : std_logic;
 	signal bank0_wmux : std_logic;	-- 0: write to x, 1: write to y
 	signal bank1_wmux : std_logic;
-	
+
 	signal a_bank_1, b_bank_1 : std_logic;
 begin
 	-- Arbitration logic
 	bank0_rmux <= '0' when a_valid = '1' and a_bank = '0' else
 	              '1' when b_valid = '1' and b_bank = '0' else
 	              '-';
-	
+
 	bank1_rmux <= '0' when a_valid = '1' and a_bank = '1' else
 	              '1' when b_valid = '1' and b_bank = '1' else
 	              '-';
 
 	b_conflict <= '1' when (a_valid and b_valid) = '1' and a_bank = b_bank else '0';
-	
+
 	bank0_wmux <= '0' when x_valid = '1' and x_bank = '0' else
 	              '1' when y_valid = '1' and y_bank = '0' else
 	              '-';
-	
+
 	bank1_wmux <= '0' when x_valid = '1' and x_bank = '1' else
 	              '1' when y_valid = '1' and y_bank = '1' else
 	              '-';
 
-	y_conflict <= '1' when (a_valid and b_valid) = '1' and a_bank = b_bank else '0';
+	y_conflict <= '1' when (x_valid and y_valid) = '1' and x_bank = y_bank else '0';
 
 	-- Read address mux
 	bank0_rdaddr <= b_addr when bank0_rmux = '1' else a_addr;
@@ -91,7 +91,7 @@ begin
 	-- Do not mux wren signals, compute them!
 	bank0_wren <= '1' when (x_valid = '1' and x_bank = '0') or (y_valid = '1' and y_bank = '0') else
 	              '0';
-	
+
 	bank1_wraddr <= y_addr when bank1_wmux = '1' else x_addr;
 	bank1_wordenable <= y_wordenable when bank1_wmux = '1' else x_wordenable;
 	bank1_wrdata <= y_data when bank1_wmux = '1' else x_data;
@@ -139,7 +139,7 @@ begin
 			end if;
 		end if;
 	end process;
-	
+
 	-- Read data mux
 	-- No bypass for now. Need to mux bypass here eventually
 	a_data <= bank1_rddata when a_bank_1 = '1' else bank0_rddata;

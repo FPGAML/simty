@@ -6,11 +6,17 @@ use work.Simty_Pkg.all;
 entity Simty is
 	port (
 		clock, reset : in std_logic;
-		
+
 		-- Memory access interface
 		pu_request : out Bus_Request;
 		pu_response : in Bus_Response;
-		
+
+		-- i_request : out ICache_Request;
+		-- i_response : in ICache_Response;
+
+		icache_req_1 : out ICache_Request;
+		icache_resp_2 : in ICache_Response;
+
 		mmio_in : in std_logic_vector(31 downto 0);
 		mmio_out : out std_logic_vector(31 downto 0)
 	);
@@ -27,10 +33,12 @@ architecture structural of Simty is
 	signal init_nmpc_alive, fs_nmpc_alive : std_logic;
 
 	signal mpc_1, mpc_2, mpc_3, mpc_4, mpc_5, mpc_6, mpc_7, mpc_8 : code_address;
+	signal mpc_7_mul4 : std_logic_vector(log_codesize - 1 downto 0);
+
 	signal wid_1, wid_2, wid_3, wid_4, wid_5, wid_6, wid_7, wid_8 : warpid;
 
-	signal icache_req_1 : ICache_Request;
-	signal icache_resp_2 : ICache_Response;
+--	signal icache_req_1 : ICache_Request;
+--	signal icache_resp_2 : ICache_Response;
 
 	signal iw_2 : instruction_word;
 	signal ignorepath_2 : std_logic;
@@ -75,12 +83,17 @@ architecture structural of Simty is
 	signal memwriteback_9, memwriteback_10, memwriteback_11 : vector;
 	signal memwriteback_valid_9, memwriteback_valid_10, memwriteback_valid_11 : std_logic;
 	signal memwriteback_wid_9, memwriteback_wid_10, memwriteback_wid_11 : warpid;
-	signal write_mask_8, write_mask_9, write_mask_10, write_mask_11 : mask;
+	signal valid_mask_8, write_mask_8, write_mask_9, write_mask_10, write_mask_11 : mask;
 	signal memwriteback_ack_5 : std_logic;
 	signal memwriteback_rd_11 : register_id;
 	--signal ldxb_control_8, ldxb_control_9 : std_logic_vector(warpsize * (log_blocksize - 2) - 1 downto 0);
 	--signal subword_mux_7 : std_logic_vector(warpsize * 2 - 1 downto 0);
 	signal mmio_in_0, mmio_out_0 : std_logic_vector(31 downto 0);
+
+	signal mem_request_address : block_address;
+
+	signal iw_from_inst_mem : instruction_word;
+
 
 	-- DEBUG
 	--signal rs1_4, rs2_4 : register_id;
@@ -98,11 +111,11 @@ begin
 			nmpc_wid => init_nmpc_wid,
 			nmpc_alive => init_nmpc_alive
 		);
-	
+
 	fs_nmpc <= init_nmpc when init = '1' else nmpc;
 	fs_nmpc_wid <= init_nmpc_wid when init = '1' else nmpc_wid;
 	fs_nmpc_alive <= init_nmpc_alive when init = '1' else nmpc_alive;
-	
+
 	-- Stage 0
 	fs : Fetch_Steering
 		port map (
@@ -120,7 +133,7 @@ begin
 			mpc_valid => mpc_valid_1,
 			wid => wid_1
 		);
-	
+
 	-- Stage 1
 	ifetch : Fetch
 		port map (
@@ -139,14 +152,16 @@ begin
 			icache_req => icache_req_1,
 			icache_resp => icache_resp_2
 		);
-	imem : Instruction_Memory
-		port map (
-			clock => clock,
-			reset => reset,
-			request => icache_req_1,
-			response => icache_resp_2
-		);
-	
+
+	iw_from_inst_mem <= icache_resp_2.data;
+--	imem : Instruction_Memory
+--		port map (
+--			clock => clock,
+--			reset => reset,
+--			request => icache_req_1,
+--			response => icache_resp_2
+--		);
+
 	-- Stage 2
 	predec : Predecode
 		port map (
@@ -163,7 +178,7 @@ begin
 			nmpc_wid => pnmpc_wid_3,
 			ack_refill => ack_refill_3
 		);
-	
+
 	-- Stage 3
 	sched : Schedule
 		port map (
@@ -182,14 +197,14 @@ begin
 			ready_mpc => mpc_4,
 			ready_wid => wid_4
 		);
-	
+
 	-- DEBUG
 	--rs1_valid_4 <= piw_4.rs1_valid;
 	--rs1_4 <= piw_4.iw(19 downto 15);
 	--rs2_valid_4 <= piw_4.rs2_valid;
 	--rs2_4 <= piw_4.iw(24 downto 20);
 	--rd_valid_4 <= piw_4.rd_valid;
-	
+
 	-- Stage 4
 	coll : Collect
 		port map (
@@ -209,14 +224,14 @@ begin
 			memwriteback_wid => memwriteback_wid_11,
 			memwriteback_rd => memwriteback_rd_11,
 			memwriteback_mask => write_mask_11,
-			memwriteback_ack => memwriteback_ack_5,
+			memwriteback_ack => memwriteback_ack_5, -- ack_6?
 			s1 => s1_5,
 			s2 => s2_5,
 			insn_out => piw_5,
 			mpc_out => mpc_5,
 			wid_out => wid_5
 		);
-		
+
 	-- Stage 5
 	id : Decode	-- TODO: Merge with collect?
 		port map (
@@ -229,7 +244,7 @@ begin
 		);
 	s1_6 <= s1_5;	-- Combinatorial stage
 	s2_6 <= s2_5;
-	
+
 	-- Stage 6
 	-- Assumes Execute and Convergence_Tracker have the same latency
 	exu : Execute
@@ -250,6 +265,7 @@ begin
 			mpc_out => mpc_7,
 			wid_out => wid_7
 		);
+	mpc_7_mul4 <= mpc_7 & "00";
 
 	ct : Convergence_Tracker_CT	-- TODO generate statement, or configuration
 		port map (
@@ -284,9 +300,9 @@ begin
 			init_alive_mask => init_alive_mask,
 			init_nextwid => init_nextwid
 		);
-	
+
 	writeback_mask_7 <= context_7.vmask when insn_7.writeback_d = '1' else (others => '0');
-	
+
 	-- Stage 7
 	-- Assumes Branch and Coalescing have the same latency
 	bu : Branch
@@ -327,12 +343,12 @@ begin
 			leader_offset => leader_offset_8
 			-- insn_out, mpc_out, wid_out ignored
 		);
-	
+
 	-- Stage 8
 	-- TODO: proper memory access component connected to async bus
-	is_branch_8 <= '1' when insn_8.branchop /= Nop else '0';	
+	is_branch_8 <= '1' when insn_8.branchop /= Nop else '0';
 	is_mem_8 <= '1' when insn_8.memop = LD or insn_8.memop = ST else '0';
-	
+
 	-- mmio output
 	-- Placeholder: actual mmio should use byte enable masks and stuff
 	-- And should be outside the core in the first place!
@@ -341,27 +357,31 @@ begin
 		if rising_edge(clock) then
 			if reset = '1' then
 				mmio_out_0 <= (others => '0');
+				valid_mask_8 <= (others => '0'); -- EmptyMask
 			else
 				if request_8.valid = '1' and request_8.is_write = '1' and request_8.address = (31 downto log_blocksize => '0') then
 					mmio_out_0 <= request_8.data(31 downto 0);
+
 				end if;
 				mmio_in_0 <= mmio_in;
+				valid_mask_8 <= context_7.vmask;
 			end if;
 		end if;
 	end process;
 	mmio_out <= mmio_out_0;
-	
+
 	pu_request <= request_8;
+	mem_request_address <= request_8.address;
 	-- I/O happen here
 	response_9 <= pu_response;
 
 	-- mux mmio input here
 	dmem_data_9 <= response_9.data;
 	memwriteback_valid_9 <= response_9.valid;
-	
+
 	-- Assumes synchronous single-cycle memory!
 	-- TODO store info in MSHRs for asynchronous memories
-	write_mask_8 <= request_8.write_mask;
+	write_mask_8 <= valid_mask_8 and not replay_mask_8;--request_8.write_mask;
 	mem_address_8 <= request_8.address;
 	process(clock) is
 	begin
@@ -383,9 +403,9 @@ begin
 			end if;
 		end if;
 	end process;
-	
+
 	memwriteback_wid_9 <= response_9.wid;
-	
+
 	-- Stage 9
 	memgather : Gather
 		port map (
@@ -405,9 +425,9 @@ begin
 			insn_out => insn_10,
 			wid_out => memwriteback_wid_10
 		);
-	
+
 	-- What about a memwriteback/MSHR type?
-	
+
 	-- Stage 10
 	-- writeback fifo
 	-- Move to stage 9?
@@ -415,7 +435,7 @@ begin
 		port map (
 			clock => clock,
 			reset => reset,
-			--push_full => 
+			--push_full =>
 			push_valid => memwriteback_valid_10,
 			push_wid => memwriteback_wid_10,
 			push_data => memwriteback_10,

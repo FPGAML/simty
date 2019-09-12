@@ -40,12 +40,12 @@ architecture structural of SALU is
 	signal funnel_shamt : std_logic_vector(4 downto 0);
 	signal funnel_c : std_logic;
 begin
-	is_sub <= '1' when (insn.alu_alt = '1' and insn.alu_ctl = AddSub) or insn.alu_ctl = Compare else '0';
+	is_sub <= '1' when (insn.alu_alt = '1' and insn.alu_ctl = AddSub and insn.b_is_imm = '0') or insn.alu_ctl = Compare else '0';
 	a <= to_scalar(mpc) when insn.a_is_pc = '1' else
 	     s1;
 	bmux <= insn.imm when insn.b_is_imm = '1' else s2;
 	b <= not bmux when is_sub = '1' or insn.alu_ctl = SL else bmux;	-- Negate amount for left shifts, can be immediate
-	
+
 	carry_in <= "1" when is_sub = '1' else "0";
 	rwide <= resize(unsigned(a),33) + unsigned(b) + carry_in;
 	r_add <= std_logic_vector(rwide(31 downto 0));
@@ -64,24 +64,24 @@ begin
 		        (not n) or z when GE,
 		        (not v) or z when GEU,
 		        '0'          when others;
-	
+
 	r_bool <= X"0000_0001" when cond_alu = '1' else (others => '0');
 	cond <= cond_alu;
-	
+
 	-- Shifter
 	-- Naive trust-the-tool impl, just for fun
 	--shift_amount <= unsigned(b(4 downto 0));
 	--r_shift <= std_logic_vector(shift_left(unsigned(a), to_integer(shift_amount))) when insn.alu_ctl = SL else
      --         std_logic_vector(shift_right(unsigned(a), to_integer(shift_amount))) when insn.alu_ctl = SR and insn.alu_alt = '0' else
 	--			  std_logic_vector(shift_right(signed(a), to_integer(shift_amount)));
-	
+
 	-- SL(a,s) = funnel(a:0,/s,1)
 	-- SRL(a,s) = funnel(0:a,s,0)
 	-- SRA(a,s) = funnel(a31,a,s,0)
 	funnel_hi <= a when insn.alu_ctl = SL else
 	             (others => a(31)) when insn.alu_ctl = SR and insn.alu_alt = '1' else -- SRA
 	             (others => '0'); --SRL
-	
+
 	funnel_lo <= (others => '0') when insn.alu_ctl = SL else
 	             a; -- SRL, SRA
 	funnel_shamt <= b(4 downto 0);	-- Already negated
@@ -93,9 +93,9 @@ begin
 			shamt => funnel_shamt,
 			c => funnel_c,
 			r => r_shift);
-	
+
 	-- May move shifter out of the ALU to a multi-cycle exec unit eventually
-	
+
 	-- Mux to d
 	with insn.alu_ctl select
 		d <= r_add   when AddSub,
@@ -107,5 +107,5 @@ begin
 		     to_scalar(fallthrough_pc) when FTPC,
 		     b       when PassB,
 		     (others => '0') when others;
-	
+
 end architecture;

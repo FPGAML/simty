@@ -6,12 +6,12 @@ package simty_pkg is
 	constant log_warpcount : natural := 3;
 	constant log_warpsize : natural := 2;
 	constant warpcount : natural := 2**log_warpcount;
-	constant warpsize : natural := 2**log_warpsize;
-	constant log_blocksize : natural := log_warpsize + 2;	-- In bytes
+	constant warpsize : natural := 2**log_warpsize; -- 4
+	constant log_blocksize : natural := log_warpsize + 2;	-- In bytes  -- 4
 	constant log_codesize : natural := 32;
 
 	constant calldepth_width : natural := 8;
-	
+
 	--type std_logic_matrix is array (natural range <>) of std_logic_vector;
 	subtype address is std_logic_vector(31 downto 0);
 	subtype code_address is std_logic_vector(log_codesize - 1 downto 2);	-- Always 4-byte aligned, potentially limited physical memory area
@@ -22,7 +22,7 @@ package simty_pkg is
 	subtype laneid is std_logic_vector(log_warpsize - 1 downto 0);
 	subtype block_address is std_logic_vector(31 downto log_blocksize);
 	subtype calldepth_count is std_logic_vector(calldepth_width - 1 downto 0);
-	
+
 	subtype opcode is std_logic_vector(6 downto 0);
 	subtype register_id is std_logic_vector(4 downto 0);
 	type alu_op is (Addsub, Sl, Compare, Bxor, Sr, Bor, Band, FTPC, PassB, Nop);
@@ -40,17 +40,17 @@ package simty_pkg is
 			rs1_valid : std_logic;
 			rs2_valid : std_logic;
 		end record;
-	
+
 	constant NopPredec : predecoded_instruction := (iw => (others => '0'), valid => '0',
 		opcode => Invalid, rd_valid => '0', rs1_valid => '0', rs2_valid => '0');
-	
+
 	type decoded_instruction is
 		record
 			valid : std_logic;
 			--itype : instruction_type;
 			alu_ctl : alu_op;
 			alu_alt : std_logic;
-			
+
 			a_is_pc : std_logic;	-- Is ALU input a PC?
 			b_is_imm : std_logic;	-- Is ALU input b an immediate? RS2 may be used elsewhere.
 			compop : compop_t;
@@ -59,22 +59,22 @@ package simty_pkg is
 			memop : memop_t;
 			sysop : sysop_t;
 			mem_size : std_logic_vector(2 downto 0);
-			
+
 			-- Invalid registers set to register 0
 			rd : register_id;
 			rs1 : register_id;
 			rs2 : register_id;
 			imm : address;
 		end record;
-	
+
 	constant NopDec : decoded_instruction := (valid => '0', alu_ctl => Nop, alu_alt => '0',
 		a_is_pc => '0', b_is_imm => '0', compop => EQ, writeback_d => '0', branchop => Nop,
 		memop => Nop, sysop => Nop, mem_size => "000", rd => (others => '0'), rs1 => (others => '0'), rs2 => (others => '0'),
 		imm => (others => '0'));
-	
+
 	constant DummyPC : code_address := (others => '1');
 	constant StartPC : code_address := (9 => '1', others => '0');	-- 0x200
-	
+
 	subtype vector is std_logic_vector(32 * warpsize - 1 downto 0);
 	subtype rfbank_address is std_logic_vector(4 + log_warpcount - 1 downto 0);	-- log(32*nwarps/2)
 	subtype mask is std_logic_vector(warpsize - 1 downto 0);
@@ -83,7 +83,8 @@ package simty_pkg is
 	constant FullMask : mask := (others => '1');
 
 	function to_scalar(c : code_address) return scalar;
-	
+
+
 	type Path is record
 		valid : std_logic;
 		mpc : code_address;
@@ -116,7 +117,7 @@ package simty_pkg is
 		is_read : std_logic;
 		is_write : std_logic;
 	end record;
-	
+
 	type Bus_Response is record
 		valid : std_logic;
 		wid : warpid;
@@ -125,14 +126,23 @@ package simty_pkg is
 		data : vector;
 	end record;
 
+	function set_request(expr : boolean ; req : Bus_Request) return Bus_Request;
+	function set_response(vga_resp : Bus_Response ; scratch_resp : Bus_Response ; testio_resp : Bus_Response) return Bus_Response;
+
 	component Simty is
 		port (
 			clock, reset : in std_logic;
-		
+
 			-- Memory access interface
 			pu_request : out Bus_Request;
 			pu_response : in Bus_Response;
-		
+
+			--i_request : out ICache_Request;
+			--i_response : in ICache_Response;
+
+			icache_req_1 : out ICache_Request;
+			icache_resp_2 : in ICache_Response;
+
 			mmio_in : in std_logic_vector(31 downto 0);
 			mmio_out : out std_logic_vector(31 downto 0)
 		);
@@ -172,7 +182,7 @@ package simty_pkg is
 			a_wr_enable : in std_logic;
 			a_wr_data : in std_logic_vector(32 - 1 downto 0);
 			a_wr_byteenable : in std_logic_vector(3 downto 0);
-		
+
 			b_clock : in std_logic;
 			b_address : in unsigned(logdepth - 1 downto 0);
 			b_rd_data : out std_logic_vector(32 - 1 downto 0);
@@ -231,11 +241,11 @@ package simty_pkg is
 			clock : in std_logic;
 			reset : in std_logic;
 			init : in std_logic;
-		
+
 			nmpc_early : in code_address;	-- Guess of branch predictor/decode: potentially speculative next MPC
 			nmpc_early_valid : in std_logic;
 			nmpc_early_wid : in warpid;
-		
+
 			nmpc : in code_address;		-- Feedback from memory and branch unit: nonspeculative next MPC
 			nmpc_valid : in std_logic;
 			nmpc_alive : in std_logic;
@@ -260,7 +270,7 @@ package simty_pkg is
 			nmpc_valid : in std_logic;
 			nmpc_wid : in warpid;
 			ignorepath : out std_logic;
-		
+
 			-- Interface to Imem/Icache
 			icache_req : out ICache_Request;
 			icache_resp : in ICache_Response
@@ -279,7 +289,7 @@ package simty_pkg is
 
 			mpc_out : out code_address;
 			wid_out : out warpid;
-		
+
 			nmpc : out code_address;		-- Feedback to fetch steering unit: speculative next MPC (static branch prediction)
 			nmpc_valid : out std_logic;
 			nmpc_wid : out warpid;
@@ -298,7 +308,7 @@ package simty_pkg is
 			ack_refill : out std_logic;
 			accept_even : in std_logic;
 			accept_odd : in std_logic;
-		
+
 			mem_wakeup_valid : in std_logic;	-- LD and ST need to assert this
 			mem_wakeup_wid : in warpid;
 
@@ -322,14 +332,14 @@ package simty_pkg is
 			writeback_wid : in warpid;
 			writeback_rd : in register_id;
 			writeback_mask : in mask;
-		
+
 			memwriteback : in vector;
 			memwriteback_valid : in std_logic;
 			memwriteback_wid : in warpid;
 			memwriteback_rd : in register_id;
 			memwriteback_mask : in mask;
 			memwriteback_ack : out std_logic;
-		
+
 			s1 : out vector;
 			s2 : out vector;
 			insn_out : out predecoded_instruction;	-- Won't use rs1 and rs2 any more, but trust logic optimization
@@ -384,12 +394,12 @@ package simty_pkg is
 			leader : out laneid;
 			leader_mask : out mask;
 			invalid : out std_logic;
-		
+
 			nextpcs : in code_address_vector;
 			nextwid : in warpid;
 			nextalive : in mask;
 			nextpcs_invalid : in std_logic
-		
+
 			--insn_out : out decoded_instruction;
 			--mpc_out : out address;
 			--wid_out : out warpid
@@ -407,7 +417,7 @@ package simty_pkg is
 			context_in : in Path;
 			condition : in mask;
 			leader : in laneid;
-		
+
 			default_context : out Path;
 			taken_replay_context : out Path;
 
@@ -416,6 +426,28 @@ package simty_pkg is
 			wid_out : out warpid
 		);
 	end component;
+
+	component Bus_Arbiter is
+		port (
+			-- Inputs
+			clock : in std_logic;
+			reset : in std_logic;
+			request : in Bus_Request; -- from simty
+			vga_response : in Bus_Response;
+			scratchpad_response : in Bus_Response;
+			testio_response : in Bus_Response;
+
+			-- Outputs
+			vga_request  : out Bus_Request;
+			scratchpad_request : out Bus_Request;
+			testio_request : out Bus_Request;
+
+			response : out Bus_Response -- back to simty
+
+		);
+	end component;
+
+
 	component Branch_Arbiter is
 		port (
 			-- Branch arbiter mode
@@ -434,7 +466,7 @@ package simty_pkg is
 			addresses : in vector;
 			valid_mask : in mask;
 			is_mem : in std_logic;
-		
+
 			-- vector of addresses for multi-bank memory
 			bank_address : out block_address;							-- To L1D$
 			address_valid : out std_logic;
@@ -450,12 +482,12 @@ package simty_pkg is
 			mpc_in : in code_address;
 			wid_in : in warpid;
 			insn_in : in decoded_instruction;
-		
+
 			valid_mask : in mask;	-- From MSHP
 			leader : in laneid;		-- binary
 			leader_mask : in mask;	-- one-hot
 			--invalid : in std_logic;
-		
+
 			vector_address : in vector;	-- From EX
 			store_data_in : in vector;
 
@@ -483,8 +515,8 @@ package simty_pkg is
 			replay_mask : in mask;	-- From MA
 			--valid_mask : in mask;
 			nextpcs_out : out code_address_vector;	-- To MSHP
-		
-		
+
+
 			--insn_out : out decoded_instruction;
 			--mpc_out : out address;
 			wid_out : out warpid
@@ -498,6 +530,17 @@ package simty_pkg is
 			response : out Bus_Response
 		);
 	end component;
+
+	component Testio is
+		port (
+			clock : in std_logic;
+			reset : in std_logic;
+			request : in Bus_Request;
+			response : out Bus_Response
+		);
+	end component;
+
+
 	component Crossbar is
 		generic (
 			log_win : natural;
@@ -570,20 +613,20 @@ package simty_pkg is
 		port (
 			clock : in std_logic;
 			reset : in std_logic;
-		
+
 			-- Read ports a, b
 			-- a has the priority: always succeed
 			a_valid : in std_logic;
 			a_addr : in rfbank_address;
 			a_bank : in std_logic;
 			a_data : out vector;
-		
+
 			b_valid : in std_logic;
 			b_addr : in rfbank_address;
 			b_bank : in std_logic;
 			b_data : out vector;
 			b_conflict : out std_logic;
-		
+
 			-- Write ports x, y
 			-- x has the priority
 			x_valid : in std_logic;
@@ -591,7 +634,7 @@ package simty_pkg is
 			x_bank : in std_logic;
 			x_data : in vector;
 			x_wordenable : in mask;
-		
+
 			y_valid : in std_logic;
 			y_addr : in rfbank_address;
 			y_bank : in std_logic;
@@ -609,7 +652,7 @@ package simty_pkg is
 			nextpcs : out code_address_vector;
 			alive_mask : out mask;
 			nextwid : out warpid;
-		
+
 			nmpc : out code_address;
 			nmpc_wid : out warpid;
 			nmpc_alive : out std_logic
@@ -628,25 +671,25 @@ package simty_pkg is
 			--pcs_7 : out code_address_vector;	-- To BU (for now)
 			leader_7 : out laneid;
 			leader_mask_7 : out mask;
-		
+
 			-- Feedback from Branch/Coalescing units
 			wid_8 : in warpid;
 			--insn_8 : in decoded_instruction;
 			is_mem_8 : in std_logic;
 			memory_replay_mask_8 : in mask;	-- From coalescer
-		
+
 			--nextpcs_8 : in code_address_vector;	-- From BU (for now)
-		
+
 			is_branch_8 : in std_logic;
 			branch_default_context_8 : in Path;
 			branch_taken_replay_context_8 : in Path;
-		
+
 			-- Feedback to Front-end
 			nmpc : out code_address;
 			nmpc_alive : out std_logic;
 			nmpc_valid : out std_logic;
 			nmpc_wid : out warpid;
-		
+
 			-- Init interface
 			init : in std_logic;
 			init_nextpcs : in code_address_vector;
@@ -683,7 +726,7 @@ package simty_pkg is
 			a : in Path;
 			b : in Path;
 			c : in Path;
-		
+
 			x : out Path;
 			y : out Path;
 			z : out Path
@@ -701,22 +744,22 @@ package simty_pkg is
 			context_7 : out Path;
 			leader_7 : out laneid;
 			leader_mask_7 : out mask;
-		
+
 			-- Feedback from Branch/Coalescing units
 			wid_8 : in warpid;
 			is_mem_8 : in std_logic;
 			memory_replay_mask_8 : in mask;	-- From coalescer
-		
+
 			is_branch_8 : in std_logic;	-- From BU
 			branch_default_context_8 : in Path;
 			branch_taken_replay_context_8 : in Path;
-		
+
 			-- Feedback to Front-end
 			nmpc : out code_address;
 			nmpc_alive : out std_logic;
 			nmpc_valid : out std_logic;
 			nmpc_wid : out warpid;
-		
+
 			-- Init interface
 			init : in std_logic;
 			init_nextpcs : in code_address_vector;
@@ -739,7 +782,7 @@ package simty_pkg is
 			reset : in std_logic;
 			pu_request : in Bus_Request;
 			pu_response : out Bus_Response;
-		
+
 			vga_clock : in std_logic;
 			vga_addr : in std_logic_vector(15 downto 0);
 			vga_out : out std_logic_vector(7 downto 0)
@@ -764,4 +807,41 @@ package body simty_pkg is
 			return c & "00";
 		end if;
 	end function;
+
+
+	function set_request(expr : boolean ; req : Bus_Request) return Bus_Request is
+		variable generated_request : Bus_Request;
+	begin
+		generated_request := req;
+		if expr then
+			generated_request.valid := '1';
+		else
+			generated_request.valid := '0';
+		end if;
+		return generated_request;
+	end function;
+
+	function set_response(vga_resp : Bus_Response ; scratch_resp : Bus_Response ; testio_resp : Bus_Response) return Bus_Response is
+		variable generated_response : Bus_Response;
+	begin
+		if vga_resp.valid = '1' then
+			generated_response := vga_resp;
+			if scratch_resp.valid = '1' or testio_resp.valid = '1' then
+				generated_response.valid := '0';
+			end if;
+			return generated_response;
+		end if;
+
+		if scratch_resp.valid = '1' then
+			generated_response := scratch_resp;
+			if testio_resp.valid = '1' then -- vga_resp.valid can't be 1 at this point
+				generated_response.valid := '0';
+			end if;
+			return generated_response;
+		end if;
+
+		generated_response := testio_resp; -- if we get to that point, vga_resp..valid and scratch_resp..valid are both 0
+		return generated_response;	-- the valid bit is therefore already correct, since both other valid bits are 0
+	end function;
+
 end package body;

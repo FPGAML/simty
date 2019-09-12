@@ -13,10 +13,10 @@ entity Collect is
 		mpc_in : in code_address;
 		wid_in : in warpid;
 		insn_in : in predecoded_instruction;
-		
+
 		accept_even : out std_logic;	-- scheduler hints
 		accept_odd : out std_logic;
-		
+
 		-- Result from ALU, for writeback and bypass
 		-- No bypass for now
 		-- bypass_d : in vector;
@@ -27,14 +27,14 @@ entity Collect is
 		writeback_wid : in warpid;
 		writeback_rd : in register_id;
 		writeback_mask : in mask;
-		
+
 		memwriteback : in vector;
 		memwriteback_valid : in std_logic;
 		memwriteback_wid : in warpid;
 		memwriteback_rd : in register_id;
 		memwriteback_mask : in mask;
-		memwriteback_ack : out std_logic;
-		
+		memwriteback_ack : out std_logic; -- collector ready / available
+
 		s1 : out vector;
 		s2 : out vector;
 		insn_out : out predecoded_instruction;	-- Won't use rs1 and rs2 any more, but trust logic optimization
@@ -53,11 +53,11 @@ architecture structural of Collect is
 	signal memwriteback_addr : rfbank_address;
 	--signal writeback_byteenable : std_logic_vector(warpsize * 4 - 1 downto 0);
 	signal enable_writeback, enable_memwriteback : std_logic;
-	signal memwriteback_nack : std_logic;
+	signal memwriteback_11, memwriteback_nack : std_logic;
 	signal a_1, a_byp_1, a_2 : vector;
 	signal b_2 : vector;
 	signal a_addr0, b_addr1 : rfbank_address;
-	
+
 	signal wid0, wid1, wid2 : warpid;
 	signal insn0, insn1, insn2 : predecoded_instruction;
 	signal mpc0, mpc1, mpc2 : code_address;
@@ -68,7 +68,7 @@ begin
 
 	rs1_0 <= insn_in.iw(19 downto 15) when insn_in.rs1_valid = '1' else (others => '0');
 	rs2_0 <= insn_in.iw(24 downto 20) when insn_in.rs2_valid = '1' else (others => '0');
-	
+
 	process(clock) is
 	begin
 		if rising_edge(clock) then
@@ -107,17 +107,17 @@ begin
 	wid0 <= wid_in;
 	insn0 <= insn_in;
 	mpc0 <= mpc_in;
-	
+
 	a_addr0 <= wid0(wid0'high downto 1) & rs1_0;
 	b_addr1 <= wid1(wid1'high downto 1) & rs2_1;
 
 	-- Writeback
 	writeback_addr <= writeback_wid(writeback_wid'high downto 1) & writeback_rd;
 	memwriteback_addr <= memwriteback_wid(memwriteback_wid'high downto 1) & memwriteback_rd;
-	
+
 	enable_writeback <= '0' when writeback_rd = "00000" else '1';
 	enable_memwriteback <= '0' when memwriteback_rd = "00000" else memwriteback_valid;
-	
+
 	-- Input stage 0/1, output stage 1/2
 	rf : Banked_RF
 		port map (
@@ -125,7 +125,7 @@ begin
 			reset => reset,
 
 			-- Port a: stage 0 -> stage 1
-			a_valid => insn0.rs1_valid,	
+			a_valid => insn0.rs1_valid,
 			a_addr => a_addr0,
 			a_bank => wid0(0),
 			a_data => a_1,
@@ -136,13 +136,13 @@ begin
 			b_bank => wid1(0),
 			b_data => b_2,
 			--b_conflict => open,
-			
+
 			x_valid => enable_writeback,
 			x_addr => writeback_addr,
 			x_bank => writeback_wid(0),
 			x_data => writeback_d,
 			x_wordenable => writeback_mask,
-			
+
 			y_valid => enable_memwriteback,
 			y_addr => memwriteback_addr,
 			y_bank => memwriteback_wid(0),
@@ -150,8 +150,17 @@ begin
 			y_wordenable => memwriteback_mask,
 			y_conflict => memwriteback_nack);
 
-	memwriteback_ack <= memwriteback_valid and not memwriteback_nack;
-	
+	process(clock) is
+	begin
+		if rising_edge(clock) then
+			--memwriteback_11 <= memwriteback_valid;
+			memwriteback_ack <= memwriteback_valid and not memwriteback_nack;
+		end if;
+	end process;
+--	memwriteback_ack <= memwriteback_valid and not memwriteback_nack;
+
+
+
 	-- TODO: Combinatorial bypass from writeback_d to a_1, a_2, b_2
 
 	-- 2-cycle bypass for now: a_1 only
@@ -159,7 +168,7 @@ begin
 	bypass : for i in 0 to warpsize - 1 generate
 		a_byp_1(32*i+31 downto 32*i) <= writeback_d(32*i+31 downto 32*i) when enable_writeback = '1' and writeback_wid = wid1 and writeback_rd = rs1_1 and writeback_mask(i) = '1' else a_1(32*i+31 downto 32*i);
 	end generate;
-	
+
 	-- Stage 2: output
 	-- R0 maps to zero
 	s1 <= (others => '0') when rs1_2 = "00000" else a_2;

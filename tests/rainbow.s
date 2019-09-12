@@ -14,6 +14,6 @@ screenloop:
 	sw a2, 0(t0)
 	addi a1, a1, 32	# add thread count
 	blt a1, s1, screenloop
-	
+
 	add a2, a2, s0
 	j mainloop

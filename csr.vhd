@@ -30,13 +30,13 @@ begin
 	-- time timeh 0xC01 0xC81
 	-- instret intreth 0xC02 0xC82
 	--with csrid select
-	--	scalar_csr <= 
-	
+	--	scalar_csr <=
+
 	hartid_gen : for i in 0 to warpsize - 1 generate
 		hartid(32 * i + 31 downto 32 * i + log_warpcount + log_warpsize) <= (others => '0');
 		hartid(32 * i + log_warpcount + log_warpsize - 1 downto 32 * i + log_warpsize) <= wid;
 		hartid(32 * i + log_warpsize - 1 downto 32 * i) <= std_logic_vector(to_unsigned(i, log_warpsize));
 	end generate;
-	
-	csr <= hartid when insn.sysop = CSRR and csrid = X"F10" else (others => '0');
+
+	csr <= hartid when insn.sysop = CSRR and (csrid = X"F14" or csrid = X"F10") else (others => '0');
 end architecture;

@@ -15,7 +15,7 @@ entity Scratchpad is
 		--write_mask : in mask;
 		--shared_byte_enable : in std_logic_vector(3 downto 0);
 		request : in Bus_Request;
-		
+
 		-- Asynchronous response
 		response : out Bus_Response
 		--data_out : out vector;
@@ -25,17 +25,21 @@ entity Scratchpad is
 end entity;
 
 architecture structural of Scratchpad is
-	constant log_depth : natural := 7;
+--	constant log_depth : natural := 7;
+	constant log_depth : natural := 16; -- more memory
+
 	signal rd_address : std_logic_vector(log_depth - 1 downto 0);
 	signal wr_address : std_logic_vector(log_depth - 1 downto 0);
 	signal wr_enable : std_logic;
 	signal is_load_0, is_load_1 : std_logic;
 	signal wid_1 : warpid;
+	signal data_sig : std_logic_vector(128 - 1 downto 0);
 begin
-	rd_address <= request.address(log_depth + log_blocksize - 1 downto log_blocksize);
+	rd_address <= request.address(log_depth + log_blocksize - 1 downto log_blocksize); -- 7+4 downto 4 ; 11 downto 4
 	wr_address <= rd_address;
-	wr_enable <= request.is_write;
-	is_load_0 <= request.is_read;
+	wr_enable <= request.is_write and request.valid;
+	is_load_0 <= request.is_read and request.valid;
+
 	subarrays : SRAM
 		generic map (
 			width => 32 * warpsize,
@@ -68,4 +72,5 @@ begin
 	end process;
 	response.valid <= is_load_1;
 	response.wid <= wid_1;
+	data_sig <= response.data;
 end architecture;

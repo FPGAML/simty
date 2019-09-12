@@ -2,13 +2,19 @@
 #define DEFINE_H_INCLUDED
 
 #define THREAD_COUNT	32
+//#define THREAD_COUNT	4
+
+
 #define LOG_STACK_INTERLEAVING	7
 #define STACK_INTERLEAVING	0x080
 #define MAIN_START	0x00001000
 #define STACK_BASE	(0x00002000 - THREAD_COUNT * STACK_INTERLEAVING)
 
-#define SCREEN_W 160
-#define SCREEN_H 100
+//#define SCREEN_W 160
+#define SCREEN_W 64
+
+//#define SCREEN_H 100
+#define SCREEN_H 16
 
 
 #endif
