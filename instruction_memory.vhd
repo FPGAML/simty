@@ -53,9 +53,12 @@ architecture structural of Instruction_Memory is
 	--signal imem : ram := Read_File("tests/manyCopies.hex");
 	--signal imem : ram := Read_File("tests/writeAndRead.hex");
 	--signal imem : ram := Read_File("tests/fullTest.hex");
-	signal imem : ram := Read_File("tests/mandelbrot.hex");
+	--signal imem : ram := Read_File("tests/mandelbrot.hex");
 	--signal imem : ram := Read_File("tests/fCall.hex");
-	--signal imem : ram := Read_File("tests/mwp.hex");
+	signal imem : ram := Read_File("tests/mwp.hex");
+	--signal imem : ram := Read_File("tests/invert.hex");
+	--signal imem : ram := Read_File("tests/bytewrites.hex");
+
 
 
 

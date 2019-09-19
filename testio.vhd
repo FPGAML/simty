@@ -21,7 +21,7 @@ architecture structural of Testio is
 	constant ram_lines : natural := 16;
 
 	type ram is array(0 to 2**ram_lines - 1) of vector; -- a vector is 32*warpsize bits; warpsize is currently 4, so 128 bits or 16B
-	signal io_ram : ram;
+
 	-- So this would be 64 kVectors, or 1MB
 
 	-- Initialization function for simulation: plain hex format
@@ -49,6 +49,8 @@ architecture structural of Testio is
 		return output;
 	end function;
 
+	signal io_ram : ram := Read_File("tests/heximage.txt");
+
 	procedure Write_To_File(fname : string ; reqdata : vector) is
 		file mem_dump		: text open write_mode is fname;
 		variable outline	: line;
@@ -61,7 +63,7 @@ architecture structural of Testio is
 		end loop;
 	end procedure;
 
-
+--	signal imem : ram := Read_File("tests/mandelbrot.hex");
 	signal wr_enable : std_logic;
 	signal is_load_0, is_load_1 : std_logic;
 	signal wid_1 : warpid;
@@ -86,7 +88,8 @@ begin
 				response.address <= request.address;
 				if request.valid = '1' then
 					if request.is_write = '1' then
-						io_ram(to_integer(unsigned(short_address))) <= request.data;
+						--io_ram(to_integer(unsigned(short_address))) <= request.data;
+						io_ram(to_integer(unsigned(short_address))) <= set_io_data(request, io_ram(to_integer(unsigned(short_address))));
 					elsif request.is_read = '1' then
 						response.data <= io_ram(to_integer(unsigned(short_address)));
 					end if;

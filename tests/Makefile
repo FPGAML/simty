@@ -1,5 +1,5 @@
 #all: rainbow.hex mandelbrot.hex rainCopies.hex
-all: rainbow.hex rainCopies.hex rainTinyCopies.hex rainbowPlusEpsilon.hex manyCopies.hex writeAndRead.hex fullTest.hex mandelbrot.hex fCall.hex mwp.hex
+all: rainbow.hex rainCopies.hex rainTinyCopies.hex rainbowPlusEpsilon.hex manyCopies.hex writeAndRead.hex fullTest.hex mandelbrot.hex invert.hex bytewrites.hex fCall.hex mwp.hex
 #all: rainbow.hex #rainCopies.hex
 CFLAGS=-march=rv32i -mabi=ilp32
 
@@ -19,6 +19,12 @@ rainbow: rainbow.o
 	/opt/riscv/bin/riscv32-unknown-elf-ld -o $@ --section-start=.text=0x200 $<
 
 mandelbrot: start.o mandelbrot.o
+	/opt/riscv/bin/riscv32-unknown-elf-ld -o $@ --section-start=.text=0x200 $^
+
+invert: start.o invert.o
+	/opt/riscv/bin/riscv32-unknown-elf-ld -o $@ --section-start=.text=0x200 $^
+
+bytewrites: start.o bytewrites.o
 	/opt/riscv/bin/riscv32-unknown-elf-ld -o $@ --section-start=.text=0x200 $^
 
 rainCopies: rainCopies.o

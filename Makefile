@@ -23,6 +23,12 @@ $(PROG): $(OBJ)
 
 $(VCD): $(PROG)
 	#./simty_test --stop-time=200ns --vcd=$@
-	./simty_output_test --stop-time=4000ns --vcd=$@
+#	./simty_output_test --stop-time=2048000ns --vcd=$@
+#	./simty_output_test --stop-time=2048000ns --vcd=$@
+	./simty_output_test --stop-time=2000ns --vcd=$@
+
+#	./simty_output_test --stop-time=8000ns
+
+
 clean:
 	rm -f $(OBJ) $(PROG)

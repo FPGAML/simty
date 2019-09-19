@@ -43,6 +43,7 @@ architecture structural of Bus_Arbiter is
 
 	signal test : boolean;
 	signal sig_write_mask : mask;
+	signal sig_shared_byte_enable : std_logic_vector(3 downto 0);
 
 --	signal wtf : std_logic_vector(3 downto 0);
 begin
@@ -54,6 +55,7 @@ begin
 	data_in_response <= response.data;
 	req_valid <= request.valid;
 	sig_write_mask <= request.write_mask;
+	sig_shared_byte_enable <= request.shared_byte_enable;
 
 --	test <= ( (msb = "0000") and (request.valid = '1') );
 

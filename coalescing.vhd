@@ -53,6 +53,7 @@ architecture structural of Coalescing is
 	signal leader_byteenable : std_logic_vector(3 downto 0);
 	signal address_unaligned : std_logic;
 	signal write_mask_0, broadcast_mask_0, replay_mask_0 : mask;
+	signal is_word_access : std_logic;
 begin
 	leader_int <= to_integer(unsigned(leader));
 	leader_address <= vector_address((leader_int + 1) * 32 - 1 downto leader_int * 32); -- I feel lucky
@@ -72,7 +73,8 @@ begin
 		uniform_st_mask(i) <= '1' when to_integer(unsigned(leader_address(log_blocksize - 1 downto 2))) = i else '0';
 	end generate;
 
-	coalescing_mask <= block_mask and wordstrided_mask and valid_mask;
+	is_word_access <= '1' when insn_in.mem_size(1 downto 0) = "10" else '0';
+	coalescing_mask <= block_mask and wordstrided_mask and valid_mask and is_word_access;
 	broadcast_mask0 <= block_mask and uniform_ld_mask when insn_in.memop = LD else leader_mask;
 
 	leader_data_raw <= store_data_in((leader_int + 1) * 32 - 1 downto leader_int * 32); -- I feel really lucky

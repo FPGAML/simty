@@ -128,6 +128,8 @@ package simty_pkg is
 
 	function set_request(expr : boolean ; req : Bus_Request) return Bus_Request;
 	function set_response(vga_resp : Bus_Response ; scratch_resp : Bus_Response ; testio_resp : Bus_Response) return Bus_Response;
+	function set_io_data(breq : Bus_Request ; current_ram_block : vector) return vector;
+
 
 	component Simty is
 		port (
@@ -842,6 +844,30 @@ package body simty_pkg is
 
 		generated_response := testio_resp; -- if we get to that point, vga_resp..valid and scratch_resp..valid are both 0
 		return generated_response;	-- the valid bit is therefore already correct, since both other valid bits are 0
+	end function;
+
+	function set_io_data(breq : Bus_Request ; current_ram_block : vector) return vector is
+		variable block_to_write : vector;
+		variable byte_end : integer;
+		variable word_end : integer;
+	begin
+		for i in 0 to warpsize - 1 loop -- loop over words, of which there are warpsize per block
+			if breq.write_mask(i) = '1' then -- this word is supposed to be overwritten
+				for j in 0 to 3 loop -- loop over bytes, of which there are 4 per word
+				byte_end := i*32 + j*8 + 7;
+					if breq.shared_byte_enable(j) = '1' then
+						report(integer'image(byte_end));
+						block_to_write(byte_end downto byte_end - 7) := breq.data(			byte_end downto byte_end - 7);
+					else
+						block_to_write(byte_end downto byte_end - 7) := current_ram_block(	byte_end downto byte_end - 7);
+					end if;
+				end loop;
+			else -- this word must not be overwritten
+				word_end := i*32 + 31;
+				block_to_write(word_end downto word_end - 31) := current_ram_block(word_end downto word_end - 31);
+			end if;
+		end loop;
+		return block_to_write;
 	end function;
 
 end package body;
