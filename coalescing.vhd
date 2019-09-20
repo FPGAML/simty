@@ -83,19 +83,19 @@ begin
 	leader_data_demux0(15 downto 8) <= leader_data_raw(7 downto 0) when leader_address(0) = '1' else leader_data_raw(15 downto 8);
 	leader_data_demux0(7 downto 0) <= leader_data_raw(7 downto 0);
 	leader_data(31 downto 16) <= leader_data_demux0 when leader_address(1) = '1' else leader_data_raw(31 downto 16);
-	leader_data(15 downto 0) <= leader_data_raw(15 downto 0);
+	leader_data(15 downto 0) <= leader_data_demux0(15 downto 0);
 
 	-- Byte mask
 	subword_key <= insn_in.mem_size(1 downto 0) & leader_address(1 downto 0);
 	with subword_key select
 		leader_byteenable <=
-			"0001" when "0000",
-			"0010" when "0001",
-			"0100" when "0010",
-			"1000" when "0011",
-			"0011" when "0100",
-			"1100" when "0110",
-			"1111" when "1000",
+			"0001" when "0000", -- 0
+			"0010" when "0001", -- 1
+			"0100" when "0010", -- 2
+			"1000" when "0011", -- 3
+			"0011" when "0100", -- 4
+			"1100" when "0110", -- 6
+			"1111" when "1000", -- 8
 			"----" when others;
 	with subword_key select
 		address_unaligned <= '0' when "0000"|"0001"|"0010"|"0011"|"0100"|"0110"|"1000",

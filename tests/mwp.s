@@ -1,9 +1,15 @@
 .text
 .global _start
 _start:
+	# FFFF.FFFF FFFF.FFFF FFFF.FFFF FFFF.FFFF
+	# C = 1100
+	# 8 = 1000
+	# 4 = 0100
+	# 2 = 0010
+	# 1 = 0001
 	csrr a4, mhartid
 	mv a5, a4
-	slli a5, a5, 0x1
+	#slli a5, a5, 0x1
 	lui a0, 0x20006 # address in testio
 	add a0, a0, a5 # threadId offset
 	#li a1, 0x1 # stuff to write
@@ -11,7 +17,9 @@ _start:
 #	li a3, 0x20 # limit
 
 writeloop:
-	sh a4, 0(a0)
+	sb a4, 0(a0)
+#	sh a4, 0(a0)
+
 #	addi a2, a2, 0x1
 #	addi a0, a0, 0x20
 #	blt a2, a3, writeloop
