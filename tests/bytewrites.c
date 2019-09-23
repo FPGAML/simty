@@ -10,20 +10,25 @@ static inline int threadId() {
 	return i;
 }
 
-static inline unsigned int mul(unsigned int a, unsigned int b){
-	unsigned int res = 0;
-	for(int i=0; i<b; i++){
-		res += a;
-	}
-	return(res);
-}
-
 
 int main()
 {
-	unsigned char* dst_img = (unsigned char*)0x20008000; // some distance away from the source
+	unsigned short* wk_img = (unsigned short*)0x10001000;
+
+	unsigned short* dst_img = (unsigned short*)0x20008000; // some distance away from the source
 	int tid = threadId();
-	dst_img[(tid << 4) + tid] = (unsigned char) tid;
+
+	// wk_img[tid] = (unsigned char) tid;
+	//
+	// dst_img[tid] = wk_img[tid];
+
+	for(int i=tid; i<512; i+=THREAD_COUNT){
+		wk_img[i] = (unsigned short) i;
+	}
+
+	for(int i=tid; i<512; i+=THREAD_COUNT){
+		dst_img[i] = wk_img[i];
+	}
 
 
 

@@ -13,6 +13,8 @@ entity Gather is
 
 		address : in block_address;
 		data_block : in vector;
+
+		-- Valid mask is the mask from the memory request
 		valid_mask : in mask;
 		leader_offset : in std_logic_vector(log_blocksize - 1 downto 0);
 		broadcast_mask : in mask;
@@ -36,14 +38,14 @@ begin
 	-- Access offset within cache block
 	leader_offset_word_int <= to_integer(unsigned(leader_offset(log_blocksize - 1 downto 2)));
 	broadcast_word_raw <= data_block((leader_offset_word_int + 1) * 32 - 1 downto leader_offset_word_int * 32);
-	
+
 	-- Shift/mux broadcast word for sub-word access
 	sign_extend <= insn_in.mem_size(2);
 	broadcast_word_mux0(15 downto 0) <= broadcast_word_raw(31 downto 16) when leader_offset(1) = '1' else
 	                                    broadcast_word_raw(15 downto 0);
 	--broadcast_word_mux0(31 downto 15) <= (others => broadcast_word_raw(15) and sign_extend) when leader_offset(1) = '1' else
 	--                                     broadcast_word_raw(31 downto 15);
-	
+
 	broadcast_word(7 downto 0) <= broadcast_word_mux0(15 downto 8) when leader_offset(0) = '1' else
 	                              broadcast_word_mux0(7 downto 0);
 	-- Sign- or Zero-extend on sub-word access

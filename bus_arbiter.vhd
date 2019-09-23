@@ -59,22 +59,22 @@ begin
 
 --	test <= ( (msb = "0000") and (request.valid = '1') );
 
-	process(request)
-	variable tmp_request : Bus_Request;
-	variable make_valid : std_logic;
-	begin
-		--vga_request 		:= request;-- when msb = "0000" else vga_request;
-		--scratchpad_request	:= request;-- when msb = "0001" else scratchpad_request;
-		--testio_request		:= request;-- when msb = "0010" else testio_request;
-
-		--make_valid		:= (msb = "0000") and (request.valid = '1');
---		vga_request.valid			:= '1' when msb = "0000" and request.valid = '1' else '0';
---		tmp_request		:=	set_request_valid(vga_valid, request);
---		vga_request		:=	set_request_valid( (msb = "0000" and request.valid = '1'), request);
-		--scratchpad_request.valid	:= '1' when msb = "0001" and request.valid = '1' else '0';
-		--testio_request.valid		:= '1' when msb = "0010" and request.valid = '1' else '0';
-
-	end process;
+-- 	process(request)
+-- 	variable tmp_request : Bus_Request;
+-- 	variable make_valid : std_logic;
+-- 	begin
+-- 		--vga_request 		:= request;-- when msb = "0000" else vga_request;
+-- 		--scratchpad_request	:= request;-- when msb = "0001" else scratchpad_request;
+-- 		--testio_request		:= request;-- when msb = "0010" else testio_request;
+--
+-- 		--make_valid		:= (msb = "0000") and (request.valid = '1');
+-- --		vga_request.valid			:= '1' when msb = "0000" and request.valid = '1' else '0';
+-- --		tmp_request		:=	set_request_valid(vga_valid, request);
+-- --		vga_request		:=	set_request_valid( (msb = "0000" and request.valid = '1'), request);
+-- 		--scratchpad_request.valid	:= '1' when msb = "0001" and request.valid = '1' else '0';
+-- 		--testio_request.valid		:= '1' when msb = "0010" and request.valid = '1' else '0';
+--
+-- 	end process;
 
 	vga_request			<=	set_request( (msb = "0000" and request.valid = '1'), request);
 	scratchpad_request	<=	set_request( (msb = "0001" and request.valid = '1'), request);
@@ -106,7 +106,7 @@ begin
 			if request.valid = '1' then
 				--report "Full address: " & to_string(request.address);
 			end if;
-			if (msb /= "0000") and (msb /= "0001") and (msb /= "0010") then
+			if (request.valid = '1') and (msb /= "0000") and (msb /= "0001") and (msb /= "0010") then
 				report "Bus_Arbiter: invalid address in simty request" severity error;
 				report "MSB received: " & to_hstring(msb);
 				report "Full address: " & to_string(request.address);

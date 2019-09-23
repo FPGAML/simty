@@ -1,129 +1,129 @@
 v 4
-file . "bus_arbiter.vhd" "04ace72d8850264450cdbb8c2e20cd9eec3e68b3" "20190918165823.468":
-  entity bus_arbiter at 1( 0) + 0 on 7775;
-  architecture structural of bus_arbiter at 28( 505) + 0 on 7776;
-file . "testio.vhd" "687084a064c564aa99d904ec872fd990c9296c87" "20190918164310.312":
-  entity testio at 1( 0) + 0 on 7736;
-  architecture structural of testio at 19( 340) + 0 on 7737;
-file . "instruction_rom.vhd" "9cc638fe4d57a3ec699140c8f0489bb28af73f51" "20190918164315.758":
-  entity instruction_rom at 1( 0) + 0 on 7767;
-  architecture structural of instruction_rom at 12( 204) + 0 on 7768;
-file . "graphics_memory.vhd" "1ed4b20a4a0a12172d86fc9dc80f28c9d959483d" "20190918164314.870":
-  entity graphics_memory at 1( 0) + 0 on 7763;
-  architecture structural of graphics_memory at 19( 382) + 0 on 7764;
-file . "convergence_tracker_ct.vhd" "4b76cddd2b5761b8d869bd07886595850eff463f" "20190918164314.076":
-  entity convergence_tracker_ct at 1( 0) + 0 on 7758;
-  architecture structural of convergence_tracker_ct at 54( 1357) + 0 on 7759;
-  configuration defaultconf at 205( 5816) + 0 on 7760;
-file . "hot_context_table.vhd" "5584dcb3658a7554134819c5c89b0a3747c4a90d" "20190918164313.189":
-  entity hot_context_table at 1( 0) + 0 on 7750;
-  architecture structural of hot_context_table at 20( 404) + 0 on 7751;
-file . "convergence_tracker.vhd" "a054e77f49ffebc2799c5998a4747af0633caa98" "20190918164312.171":
-  entity convergence_tracker at 1( 0) + 0 on 7746;
-  architecture structural of convergence_tracker at 58( 1487) + 0 on 7747;
-file . "gather.vhd" "a760f8f06bad5bc81898f02edfa4c913a7e34e61" "20190918164311.687":
-  entity gather at 1( 0) + 0 on 7742;
-  architecture structural of gather at 30( 663) + 0 on 7743;
-file . "load_fifo.vhd" "f1a8ca4a10f3c1bbf78b39aa85281b284ee5e538" "20190918164310.513":
-  entity load_fifo at 1( 0) + 0 on 7738;
-  architecture structural of load_fifo at 29( 601) + 0 on 7739;
-file . "replay.vhd" "bf351635190a225f4fa0f1794dbc5c6c27c1e0f1" "20190918164310.050":
-  entity replay at 1( 0) + 0 on 7732;
-  architecture structural of replay at 28( 613) + 0 on 7733;
-file . "execute.vhd" "5a387eaf464fb26b5433a19108422a51e11410d1" "20190918164309.382":
-  entity execute at 1( 0) + 0 on 7728;
-  architecture structural of execute at 29( 632) + 0 on 7729;
-file . "schedule.vhd" "11e7ba46865a2dde9933ce4d6f99e80411e1b7dc" "20190918164308.844":
-  entity schedule at 1( 0) + 0 on 7724;
-  architecture structural of schedule at 33( 825) + 0 on 7725;
-file . "fetch.vhd" "1ba2fd25759e4c1223379003c97700520bb23eec" "20190918164308.535":
-  entity fetch at 1( 0) + 0 on 7720;
-  architecture structural of fetch at 36( 853) + 0 on 7721;
-file . "branch.vhd" "76173b6d1e982c504a9dfa6015cde8c837a2c47d" "20190918164307.917":
-  entity branch at 1( 0) + 0 on 7716;
-  architecture structural of branch at 29( 611) + 0 on 7717;
-file . "funnel_shifter.vhd" "da70521a259d80e7db59c8b9ff1f198d4040a615" "20190918164307.552":
-  entity funnel_shifter at 1( 0) + 0 on 7712;
-  architecture structural of funnel_shifter at 19( 522) + 0 on 7713;
-file . "fetch_steering.vhd" "c81aee716ca5730a73e2fb262144728020e41646" "20190918164307.229":
-  entity fetch_steering at 1( 0) + 0 on 7708;
-  architecture structural of fetch_steering at 28( 861) + 0 on 7709;
-file . "crossbar.vhd" "d52d66ed0b06afa9739a461acb553be9f3981d61" "20190918164306.902":
-  entity crossbar at 1( 0) + 0 on 7702;
-  architecture structural of crossbar at 23( 641) + 0 on 7703;
-  entity backward_crossbar at 39( 1257) + 0 on 7704;
-  architecture structural of backward_crossbar at 58( 1745) + 0 on 7705;
-file . "csr.vhd" "23f4e6a653aa8305f48d894469e17dc7e4ba7695" "20190918164306.642":
-  entity csr at 1( 0) + 0 on 7698;
-  architecture structural of csr at 20( 414) + 0 on 7699;
-file . "targetdep_sim.vhd" "692033223bd5691021d2498811701f126dfd83bc" "20190918164306.424":
-  entity sram32_dp at 4( 59) + 0 on 7694;
-  architecture portable of sram32_dp at 30( 801) + 0 on 7695;
-file . "simty_pkg.vhd" "ab73beebb933503b30cd8ce6d923031e26e8f5ef" "20190918164306.095":
-  package simty_pkg at 1( 0) + 0 on 7686 body;
-  package body simty_pkg at 803( 21310) + 0 on 7687;
-file . "sram.vhd" "0bfdb968fdffcdc6e17139d559d0d3e47c5fcf68" "20190918164306.274":
-  entity sram at 1( 0) + 0 on 7688;
-  architecture altera of sram at 32( 903) + 0 on 7689;
-  entity sram32we at 82( 2376) + 0 on 7690;
-  architecture altera of sram32we at 108( 3046) + 0 on 7691;
-  entity sram32 at 156( 4547) + 0 on 7692;
-  architecture altera of sram32 at 179( 5121) + 0 on 7693;
-file . "ffs.vhd" "c6072f48aa244c19b85f11440dc622acddf83c27" "20190918164306.531":
-  entity ffs at 1( 0) + 0 on 7696;
-  architecture structural of ffs at 22( 563) + 0 on 7697;
-file . "branch_arbiter.vhd" "b9689d7a8c8f1bd895be3df1639364e72ae52137" "20190918164306.748":
-  entity branch_arbiter at 1( 0) + 0 on 7700;
-  architecture structural of branch_arbiter at 22( 507) + 0 on 7701;
-file . "banked_rf.vhd" "1f7dd3130b50dd0de392a017565b526df5db9f38" "20190918164307.010":
-  entity banked_rf at 1( 0) + 0 on 7706;
-  architecture structural of banked_rf at 45( 1030) + 0 on 7707;
-file . "memory_arbiter.vhd" "ff5ec84c2ff3f920cdd016caffc4806999e75653" "20190918164307.376":
-  entity memory_arbiter at 1( 0) + 0 on 7710;
-  architecture structural of memory_arbiter at 29( 815) + 0 on 7711;
-file . "salu.vhd" "f3f874b06ea03eeeed5c107c60fc88e4f652703f" "20190918164307.672":
-  entity salu at 1( 0) + 0 on 7714;
-  architecture structural of salu at 30( 640) + 0 on 7715;
-file . "decode.vhd" "5bca7906df66a441926498c13626e2ba2bbf493f" "20190918164308.306":
-  entity decode at 1( 0) + 0 on 7718;
-  architecture structural of decode at 26( 567) + 0 on 7719;
-file . "predecode.vhd" "4d48883e20ee565cfc88bb26d96975c80763facf" "20190918164308.671":
-  entity predecode at 1( 0) + 0 on 7722;
-  architecture structural of predecode at 27( 651) + 0 on 7723;
-file . "collect.vhd" "1e7fa04f426e22e8927c50e4eac283534d82868c" "20190918164309.040":
-  entity collect at 1( 0) + 0 on 7726;
-  architecture structural of collect at 46( 1155) + 0 on 7727;
-file . "membership.vhd" "27d20008fd91f2b6173e8a1106b012bdc1c530a7" "20190918164309.790":
-  entity membership at 1( 0) + 0 on 7730;
-  architecture structural of membership at 36( 800) + 0 on 7731;
-file . "scratchpad.vhd" "faaac5c4a280416c8749eb24a2bc5b66b4ef9207" "20190918164310.149":
-  entity scratchpad at 1( 0) + 0 on 7734;
-  architecture structural of scratchpad at 27( 575) + 0 on 7735;
-file . "coalescing.vhd" "0d221f452714fb625f7a445a789ab9281f9ebf85" "20190920083012.320":
-  entity coalescing at 1( 0) + 0 on 7779;
-  architecture structural of coalescing at 41( 973) + 0 on 7780;
-file . "initialize.vhd" "ef1ae117c184c7378fbaf7173cc60d8157efd367" "20190918164311.988":
-  entity initialize at 1( 0) + 0 on 7744;
-  architecture structural of initialize at 22( 383) + 0 on 7745;
-file . "cold_context_table.vhd" "416262ab31ec4cb130cbfc033e37d30484934e0a" "20190918164312.844":
-  entity cold_context_table at 1( 0) + 0 on 7748;
-  architecture structural of cold_context_table at 21( 420) + 0 on 7749;
-file . "context_compact_sort.vhd" "fb055d6b9de4578e3ad7e6e90970bb7cb0b95aed" "20190918164313.395":
-  entity context_compact_sort at 1( 0) + 0 on 7752;
-  architecture structural of context_compact_sort at 26( 478) + 0 on 7753;
-  architecture structural2 of context_compact_sort at 66( 1167) + 0 on 7754;
-  architecture behavioral of context_compact_sort at 112( 2869) + 0 on 7755;
-  entity compact_sort2 at 191( 5009) + 0 on 7756;
-  architecture structural of compact_sort2 at 206( 5220) + 0 on 7757;
-file . "instruction_memory.vhd" "0b0638e102341530e85387a828d35566c70e5b9a" "20190918164314.755":
-  entity instruction_memory at 1( 0) + 0 on 7761;
-  architecture structural of instruction_memory at 18( 335) + 0 on 7762;
-file . "simty.vhd" "7edd3759a8fbbfa541a83aed8402014369919bf4" "20190918164315.006":
-  entity simty at 1( 0) + 0 on 7765;
-  architecture structural of simty at 25( 507) + 0 on 7766;
-file . "simty_test.vhd" "40c6d36b1951d6b2aff1b3e3e4d3866498ee05df" "20190918164316.517":
-  entity simty_test at 1( 0) + 0 on 7771;
-  architecture behavioral of simty_test at 9( 128) + 0 on 7772;
-file . "simty_output_test.vhd" "cc1cf1a78835a353c0fbbf64162ad1e1c8db486e" "20190918164316.686":
-  entity simty_output_test at 1( 0) + 0 on 7773;
-  architecture behavioral of simty_output_test at 9( 135) + 0 on 7774;
+file . "simty_output_test.vhd" "cc1cf1a78835a353c0fbbf64162ad1e1c8db486e" "20190920141017.326":
+  entity simty_output_test at 1( 0) + 0 on 7961;
+  architecture behavioral of simty_output_test at 9( 135) + 0 on 7962;
+file . "simty_test.vhd" "40c6d36b1951d6b2aff1b3e3e4d3866498ee05df" "20190920141017.159":
+  entity simty_test at 1( 0) + 0 on 7959;
+  architecture behavioral of simty_test at 9( 128) + 0 on 7960;
+file . "simty.vhd" "7edd3759a8fbbfa541a83aed8402014369919bf4" "20190920141015.611":
+  entity simty at 1( 0) + 0 on 7953;
+  architecture structural of simty at 25( 507) + 0 on 7954;
+file . "instruction_memory.vhd" "84ca1d51d60504d82b54af3448d3498ca6c4c485" "20190923140947.154":
+  entity instruction_memory at 1( 0) + 0 on 7973;
+  architecture structural of instruction_memory at 18( 335) + 0 on 7974;
+file . "context_compact_sort.vhd" "fb055d6b9de4578e3ad7e6e90970bb7cb0b95aed" "20190920141014.300":
+  entity context_compact_sort at 1( 0) + 0 on 7940;
+  architecture structural of context_compact_sort at 26( 478) + 0 on 7941;
+  architecture structural2 of context_compact_sort at 66( 1167) + 0 on 7942;
+  architecture behavioral of context_compact_sort at 112( 2869) + 0 on 7943;
+  entity compact_sort2 at 191( 5009) + 0 on 7944;
+  architecture structural of compact_sort2 at 206( 5220) + 0 on 7945;
+file . "cold_context_table.vhd" "416262ab31ec4cb130cbfc033e37d30484934e0a" "20190920141013.887":
+  entity cold_context_table at 1( 0) + 0 on 7936;
+  architecture structural of cold_context_table at 21( 420) + 0 on 7937;
+file . "initialize.vhd" "ef1ae117c184c7378fbaf7173cc60d8157efd367" "20190920141013.473":
+  entity initialize at 1( 0) + 0 on 7932;
+  architecture structural of initialize at 22( 383) + 0 on 7933;
+file . "coalescing.vhd" "92326d2f05a824dd9adbf4fc412b6162bb91773a" "20190923083409.622":
+  entity coalescing at 1( 0) + 0 on 7967;
+  architecture structural of coalescing at 41( 973) + 0 on 7968;
+file . "scratchpad.vhd" "faaac5c4a280416c8749eb24a2bc5b66b4ef9207" "20190920141012.474":
+  entity scratchpad at 1( 0) + 0 on 7922;
+  architecture structural of scratchpad at 27( 575) + 0 on 7923;
+file . "membership.vhd" "27d20008fd91f2b6173e8a1106b012bdc1c530a7" "20190920141012.153":
+  entity membership at 1( 0) + 0 on 7918;
+  architecture structural of membership at 36( 800) + 0 on 7919;
+file . "collect.vhd" "1e7fa04f426e22e8927c50e4eac283534d82868c" "20190920141011.536":
+  entity collect at 1( 0) + 0 on 7914;
+  architecture structural of collect at 46( 1155) + 0 on 7915;
+file . "predecode.vhd" "4d48883e20ee565cfc88bb26d96975c80763facf" "20190920141011.205":
+  entity predecode at 1( 0) + 0 on 7910;
+  architecture structural of predecode at 27( 651) + 0 on 7911;
+file . "decode.vhd" "5bca7906df66a441926498c13626e2ba2bbf493f" "20190920141010.843":
+  entity decode at 1( 0) + 0 on 7906;
+  architecture structural of decode at 26( 567) + 0 on 7907;
+file . "salu.vhd" "f3f874b06ea03eeeed5c107c60fc88e4f652703f" "20190920141010.304":
+  entity salu at 1( 0) + 0 on 7902;
+  architecture structural of salu at 30( 640) + 0 on 7903;
+file . "memory_arbiter.vhd" "ff5ec84c2ff3f920cdd016caffc4806999e75653" "20190920141010.069":
+  entity memory_arbiter at 1( 0) + 0 on 7898;
+  architecture structural of memory_arbiter at 29( 815) + 0 on 7899;
+file . "banked_rf.vhd" "1f7dd3130b50dd0de392a017565b526df5db9f38" "20190920141009.704":
+  entity banked_rf at 1( 0) + 0 on 7894;
+  architecture structural of banked_rf at 45( 1030) + 0 on 7895;
+file . "branch_arbiter.vhd" "b9689d7a8c8f1bd895be3df1639364e72ae52137" "20190920141009.445":
+  entity branch_arbiter at 1( 0) + 0 on 7888;
+  architecture structural of branch_arbiter at 22( 507) + 0 on 7889;
+file . "ffs.vhd" "c6072f48aa244c19b85f11440dc622acddf83c27" "20190920141009.211":
+  entity ffs at 1( 0) + 0 on 7884;
+  architecture structural of ffs at 22( 563) + 0 on 7885;
+file . "sram.vhd" "0bfdb968fdffcdc6e17139d559d0d3e47c5fcf68" "20190920141008.947":
+  entity sram at 1( 0) + 0 on 7876;
+  architecture altera of sram at 32( 903) + 0 on 7877;
+  entity sram32we at 82( 2376) + 0 on 7878;
+  architecture altera of sram32we at 108( 3046) + 0 on 7879;
+  entity sram32 at 156( 4547) + 0 on 7880;
+  architecture altera of sram32 at 179( 5121) + 0 on 7881;
+file . "simty_pkg.vhd" "8238b3beaab0fb7c6f288cc57ecc825fc6483d60" "20190920141008.668":
+  package simty_pkg at 1( 0) + 0 on 7874 body;
+  package body simty_pkg at 803( 21310) + 0 on 7875;
+file . "targetdep_sim.vhd" "692033223bd5691021d2498811701f126dfd83bc" "20190920141009.104":
+  entity sram32_dp at 4( 59) + 0 on 7882;
+  architecture portable of sram32_dp at 30( 801) + 0 on 7883;
+file . "csr.vhd" "23f4e6a653aa8305f48d894469e17dc7e4ba7695" "20190920141009.328":
+  entity csr at 1( 0) + 0 on 7886;
+  architecture structural of csr at 20( 414) + 0 on 7887;
+file . "crossbar.vhd" "d52d66ed0b06afa9739a461acb553be9f3981d61" "20190920141009.597":
+  entity crossbar at 1( 0) + 0 on 7890;
+  architecture structural of crossbar at 23( 641) + 0 on 7891;
+  entity backward_crossbar at 39( 1257) + 0 on 7892;
+  architecture structural of backward_crossbar at 58( 1745) + 0 on 7893;
+file . "fetch_steering.vhd" "c81aee716ca5730a73e2fb262144728020e41646" "20190920141009.926":
+  entity fetch_steering at 1( 0) + 0 on 7896;
+  architecture structural of fetch_steering at 28( 861) + 0 on 7897;
+file . "funnel_shifter.vhd" "da70521a259d80e7db59c8b9ff1f198d4040a615" "20190920141010.203":
+  entity funnel_shifter at 1( 0) + 0 on 7900;
+  architecture structural of funnel_shifter at 19( 522) + 0 on 7901;
+file . "branch.vhd" "76173b6d1e982c504a9dfa6015cde8c837a2c47d" "20190920141010.522":
+  entity branch at 1( 0) + 0 on 7904;
+  architecture structural of branch at 29( 611) + 0 on 7905;
+file . "fetch.vhd" "1ba2fd25759e4c1223379003c97700520bb23eec" "20190920141011.088":
+  entity fetch at 1( 0) + 0 on 7908;
+  architecture structural of fetch at 36( 853) + 0 on 7909;
+file . "schedule.vhd" "11e7ba46865a2dde9933ce4d6f99e80411e1b7dc" "20190920141011.347":
+  entity schedule at 1( 0) + 0 on 7912;
+  architecture structural of schedule at 33( 825) + 0 on 7913;
+file . "execute.vhd" "5a387eaf464fb26b5433a19108422a51e11410d1" "20190920141011.852":
+  entity execute at 1( 0) + 0 on 7916;
+  architecture structural of execute at 29( 632) + 0 on 7917;
+file . "replay.vhd" "bf351635190a225f4fa0f1794dbc5c6c27c1e0f1" "20190920141012.371":
+  entity replay at 1( 0) + 0 on 7920;
+  architecture structural of replay at 28( 613) + 0 on 7921;
+file . "load_fifo.vhd" "f1a8ca4a10f3c1bbf78b39aa85281b284ee5e538" "20190920141012.757":
+  entity load_fifo at 1( 0) + 0 on 7926;
+  architecture structural of load_fifo at 29( 601) + 0 on 7927;
+file . "gather.vhd" "fb712ed3e0ecb10cbf957c01fe38d1ecc330f008" "20190923083409.984":
+  entity gather at 1( 0) + 0 on 7969;
+  architecture structural of gather at 32( 716) + 0 on 7970;
+file . "convergence_tracker.vhd" "a054e77f49ffebc2799c5998a4747af0633caa98" "20190920141013.601":
+  entity convergence_tracker at 1( 0) + 0 on 7934;
+  architecture structural of convergence_tracker at 58( 1487) + 0 on 7935;
+file . "hot_context_table.vhd" "5584dcb3658a7554134819c5c89b0a3747c4a90d" "20190920141014.138":
+  entity hot_context_table at 1( 0) + 0 on 7938;
+  architecture structural of hot_context_table at 20( 404) + 0 on 7939;
+file . "convergence_tracker_ct.vhd" "4b76cddd2b5761b8d869bd07886595850eff463f" "20190920141014.869":
+  entity convergence_tracker_ct at 1( 0) + 0 on 7946;
+  architecture structural of convergence_tracker_ct at 54( 1357) + 0 on 7947;
+  configuration defaultconf at 205( 5816) + 0 on 7948;
+file . "graphics_memory.vhd" "1ed4b20a4a0a12172d86fc9dc80f28c9d959483d" "20190920141015.463":
+  entity graphics_memory at 1( 0) + 0 on 7951;
+  architecture structural of graphics_memory at 19( 382) + 0 on 7952;
+file . "instruction_rom.vhd" "9cc638fe4d57a3ec699140c8f0489bb28af73f51" "20190920141016.397":
+  entity instruction_rom at 1( 0) + 0 on 7955;
+  architecture structural of instruction_rom at 12( 204) + 0 on 7956;
+file . "testio.vhd" "687084a064c564aa99d904ec872fd990c9296c87" "20190920141012.622":
+  entity testio at 1( 0) + 0 on 7924;
+  architecture structural of testio at 19( 340) + 0 on 7925;
+file . "bus_arbiter.vhd" "db2ad56002d701bd258c050457ad57128e20134c" "20190923142502.882":
+  entity bus_arbiter at 1( 0) + 0 on 7975;
+  architecture structural of bus_arbiter at 28( 505) + 0 on 7976;

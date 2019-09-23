@@ -10,14 +10,23 @@ _start:
 	csrr a4, mhartid
 	mv a5, a4
 	#slli a5, a5, 0x1
-	lui a0, 0x20006 # address in testio
+#	lui a0, 0x20006 # address in testio
+	lui a0, 0x10001 # address in scratchpad
+	lui a1, 0x20006
+
 	add a0, a0, a5 # threadId offset
+	add a1, a1, a5
 	#li a1, 0x1 # stuff to write
 #	li a2, 0x1 # counter
 #	li a3, 0x20 # limit
 
 writeloop:
+#	sb a4, 0(a0)
+
+#	lb a6, 0(a0)
 	sb a4, 0(a0)
+	lb a5, 0(a0)
+	sb a5, 0(a1)
 #	sh a4, 0(a0)
 
 #	addi a2, a2, 0x1

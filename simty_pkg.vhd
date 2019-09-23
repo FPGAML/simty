@@ -856,7 +856,7 @@ package body simty_pkg is
 				for j in 0 to 3 loop -- loop over bytes, of which there are 4 per word
 				byte_end := i*32 + j*8 + 7;
 					if breq.shared_byte_enable(j) = '1' then
-						report(integer'image(byte_end));
+						--report(integer'image(byte_end));
 						block_to_write(byte_end downto byte_end - 7) := breq.data(			byte_end downto byte_end - 7);
 					else
 						block_to_write(byte_end downto byte_end - 7) := current_ram_block(	byte_end downto byte_end - 7);
