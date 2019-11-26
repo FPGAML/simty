@@ -91,6 +91,8 @@ package simty_pkg is
 		vmask : mask;
 		calldepth : calldepth_count;
 	end record;
+	constant EmptyPath : Path := (valid => '0', mpc => (others => '0'), vmask => (others => '0'), calldepth => (others => '0')); -- arrow direction feels backward
+
 	type CCT_Command is (Push, Pop, Nop);
 
 	type ICache_Request is record
@@ -449,6 +451,13 @@ package simty_pkg is
 		);
 	end component;
 
+	component Unit_Tester is
+		port (
+			clock : in std_logic;
+			reset : in std_logic
+		);
+	end component;
+
 
 	component Branch_Arbiter is
 		port (
@@ -716,6 +725,8 @@ package simty_pkg is
 		port (
 			clock : in std_logic;
 			reset : in std_logic;
+			dump : in std_logic;
+			isx : in std_logic;
 			wid_read : in warpid;
 			context_read : out Path;
 			write_enable : in std_logic;
@@ -869,5 +880,10 @@ package body simty_pkg is
 		end loop;
 		return block_to_write;
 	end function;
+
+
+
+
+
 
 end package body;

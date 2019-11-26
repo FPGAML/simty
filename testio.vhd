@@ -41,7 +41,7 @@ architecture structural of Testio is
 				exit;
 			end if;
 			readline(fh, ln);
-			report "line(" & integer'image(addr) & ")= " & ln.all;
+		--	report "line(" & integer'image(addr) & ")= " & ln.all;
 			hread(ln, word);
 			output(addr) := word;
 			addr := addr + 1;
@@ -51,7 +51,7 @@ architecture structural of Testio is
 
 	signal io_ram : ram := Read_File("tests/heximage.txt");
 
-	procedure Write_To_File(fname : string ; reqdata : vector) is
+	procedure Write_To_File(fname : string) is
 		file mem_dump		: text open write_mode is fname;
 		variable outline	: line;
 		variable addr		: natural := 0;
@@ -96,7 +96,7 @@ begin
 				end if;
 
 				if request.valid = '1' and request.address = X"2FFFF00" and request.wid = "111" then
-					Write_To_File("result.res", request.data);
+					Write_To_File("result.res");
 				end if;
 			end if;
 		end if;

@@ -36,13 +36,53 @@ architecture structural of Cold_Context_Table is
 	type sorter_state_vector is array (0 to warpcount - 1) of sorter_state;
 	signal state : sorter_state_vector;
 	signal sort_ptr : pointer_vector;
-	signal cct_read_address : unsigned(log_warpcount + log_warpsize - 1 downto 0);
+	signal cct_read_address_sig, cct_write_address_sig : unsigned(log_warpcount + log_warpsize - 1 downto 0);
 	signal cct_output : cct_entry;
 	signal y_1, y_in_1 : Path;
 	signal match_found_2 : std_logic_vector(warpcount - 1 downto 0);
 	signal wid_1 : warpid;
 	signal y_changed_1 : std_logic;
-	
+
+	-- debugging type
+	subtype path_as_logic_vector is std_logic_vector(log_codesize + warpsize + calldepth_width - 2 downto 0); -- size 43
+
+	-- debugging signals
+	signal command_sig_cct, state_sig : integer;
+	signal head0, head7, current_ptr_sig : cct_ptr;
+	signal entry0, entry1, entry2, entry3, entry4, entry5, entry6,
+	entry7, entry8, entry9, entry10, entry11, entry12, entry13, entry14,
+	entry15, entry16, entry17, entry18, entry19, entry20, entry21, entry22,
+	entry23, entry24, entry25, entry26, entry27, entry28, entry29, entry30, entry31, entry32 : path_as_logic_vector;
+
+
+
+	-- debugging functions
+	function Path_To_Logic_Vector(p : Path) return path_as_logic_vector is
+		variable outvector : path_as_logic_vector;
+	begin
+		outvector(calldepth_width - 1 downto 0)														:= p.calldepth;
+		outvector(warpsize + calldepth_width - 1 downto calldepth_width)							:= p.vmask;
+		outvector(log_codesize + warpsize + calldepth_width - 3 downto warpsize + calldepth_width)	:= p.mpc;
+		outvector(log_codesize + warpsize + calldepth_width - 2)									:= p.valid;
+		return outvector;
+	end function;
+
+	function Logic_Vector_To_Path(plv : path_as_logic_vector) return Path is
+		variable outpath : Path;
+	begin
+		-- calldepth_count is std_logic_vector(calldepth_width - 1 downto 0); calldepth_width is 8
+		outpath.calldepth	:= plv(calldepth_width - 1 downto 0);
+		-- mask is std_logic_vector(warpsize - 1 downto 0); warpsize is 4
+		outpath.vmask 		:= plv(warpsize + calldepth_width - 1 downto calldepth_width);
+		-- code_address is std_logic_vector(log_codesize - 1 downto 2); log_codesize is 32
+		outpath.mpc			:= plv(log_codesize + warpsize + calldepth_width - 3 downto warpsize + calldepth_width);
+		-- so that's 42
+		outpath.valid		:= plv(log_codesize + warpsize + calldepth_width - 2);
+		return outpath;
+	end function;
+	-- end of debugging functions
+
+
 	function Pack(c : Path) return cct_entry is
 		variable e : cct_entry;
 	begin
@@ -52,7 +92,7 @@ architecture structural of Cold_Context_Table is
 		e(warpsize + code_address'length + calldepth_width downto warpsize + code_address'length + 1) := c.calldepth;
 		return e;
 	end function;
-	
+
 	function Unpack(e : cct_entry) return Path is
 	begin
 		return (vmask => e(warpsize - 1 downto 0),
@@ -63,9 +103,50 @@ architecture structural of Cold_Context_Table is
 begin
 	idle <= '1' when command = Nop or (command = Pop and head(to_integer(unsigned(wid))) = null_ptr) else '0';
 
-	cct_output <= cct(to_integer(cct_read_address));
+
 	y_1 <= Unpack(cct_output);
-	
+
+
+	-- debugging code
+	command_sig_cct <= 1 when command = Push else 2 when command = Pop else 3 when command = Nop else 4;
+	state_sig <= 1 when state(to_integer(unsigned(wid))) = ResetHead else 2 when state(to_integer(unsigned(wid))) = Probe else 3;
+	head0 <= head(0);
+	head7 <= head(7);
+	entry0 <= Path_To_Logic_Vector(Unpack(cct(0)));
+	entry1 <= Path_To_Logic_Vector(Unpack(cct(1)));
+	entry2 <= Path_To_Logic_Vector(Unpack(cct(2)));
+	entry3 <= Path_To_Logic_Vector(Unpack(cct(3)));
+	entry4 <= Path_To_Logic_Vector(Unpack(cct(4)));
+	entry5 <= Path_To_Logic_Vector(Unpack(cct(5)));
+	entry6 <= Path_To_Logic_Vector(Unpack(cct(6)));
+	entry7 <= Path_To_Logic_Vector(Unpack(cct(7)));
+	entry8 <= Path_To_Logic_Vector(Unpack(cct(8)));
+	entry9 <= Path_To_Logic_Vector(Unpack(cct(9)));
+	entry10 <= Path_To_Logic_Vector(Unpack(cct(10)));
+	entry11 <= Path_To_Logic_Vector(Unpack(cct(11)));
+	entry12 <= Path_To_Logic_Vector(Unpack(cct(12)));
+	entry13 <= Path_To_Logic_Vector(Unpack(cct(13)));
+	entry14 <= Path_To_Logic_Vector(Unpack(cct(14)));
+	entry15 <= Path_To_Logic_Vector(Unpack(cct(15)));
+	entry16 <= Path_To_Logic_Vector(Unpack(cct(16)));
+	entry17 <= Path_To_Logic_Vector(Unpack(cct(17)));
+	entry18 <= Path_To_Logic_Vector(Unpack(cct(18)));
+	entry19 <= Path_To_Logic_Vector(Unpack(cct(19)));
+	entry20 <= Path_To_Logic_Vector(Unpack(cct(20)));
+	entry21 <= Path_To_Logic_Vector(Unpack(cct(21)));
+	entry22 <= Path_To_Logic_Vector(Unpack(cct(22)));
+	entry23 <= Path_To_Logic_Vector(Unpack(cct(23)));
+	entry24 <= Path_To_Logic_Vector(Unpack(cct(24)));
+	entry25 <= Path_To_Logic_Vector(Unpack(cct(25)));
+	entry26 <= Path_To_Logic_Vector(Unpack(cct(26)));
+	entry27 <= Path_To_Logic_Vector(Unpack(cct(27)));
+	entry28 <= Path_To_Logic_Vector(Unpack(cct(28)));
+	entry29 <= Path_To_Logic_Vector(Unpack(cct(29)));
+	entry30 <= Path_To_Logic_Vector(Unpack(cct(30)));
+	entry31 <= Path_To_Logic_Vector(Unpack(cct(31)));
+
+
+
 	-- Stage 0->1
 	-- Nop: sort, optionally swap y
 	-- Pop: read entry at head[wid]-1 unless head=0
@@ -77,8 +158,9 @@ begin
 	process(clock)
 		variable wid_int : integer;
 		variable my_head : cct_ptr;
-		variable cct_write_address : unsigned(log_warpcount + log_warpsize - 1 downto 0);
-		variable current_ptr : cct_ptr;
+		variable cct_write_address : unsigned(log_warpcount + log_warpsize - 1 downto 0) := (others => '0');
+		variable cct_read_address : unsigned(log_warpcount + log_warpsize - 1 downto 0) := (others => '0');
+		variable current_ptr : cct_ptr := null_ptr;
 		variable current_entry : Path;
 	begin
 		if rising_edge(clock) then
@@ -90,7 +172,7 @@ begin
 					head(i) <= null_ptr;
 				end loop;
 				state <= (others => ResetHead);
-				cct_read_address <= (others => '0');
+				--cct_read_address <= (others => '0');
 			else
 				wid_int := to_integer(unsigned(wid));
 				my_head := head(wid_int);
@@ -104,9 +186,12 @@ begin
 							--else
 							-- Decrement head first
 							my_head := my_head - to_unsigned(1, log_warpsize);
-							cct_read_address <= unsigned(wid) & my_head;
+							cct_read_address := unsigned(wid) & my_head;
 							head(wid_int) <= my_head;
 							y_changed_1 <= '1';
+							if current_ptr >= my_head then
+								state(wid_int) <= ResetHead;
+							end if;
 							--end if;
 						when Push =>
 							-- Assumes the CCT never overflows
@@ -136,14 +221,18 @@ begin
 					-- CCT sideband sorter state machine
 					case state(wid_int) is
 						when ResetHead =>
-							-- Not strictly necessary state, makes initialization and control logic easier
-							current_ptr := head(wid_int) - to_unsigned(1, log_warpsize);
-							sort_ptr(wid_int) <= current_ptr;
-							cct_read_address <= unsigned(wid) & current_ptr;
-							y_changed_1 <= '0';
-							if current_ptr /= null_ptr then
-								state(wid_int) <= Probe;
-							end if;
+						--	if head(wid_int) /= null_ptr then
+								-- Not strictly necessary state, makes initialization and control logic easier
+								current_ptr := head(wid_int) - to_unsigned(1, log_warpsize);
+								sort_ptr(wid_int) <= current_ptr;
+								cct_read_address := unsigned(wid) & current_ptr;
+								y_changed_1 <= '0';
+								if current_ptr /= null_ptr then
+									state(wid_int) <= Probe;
+								end if;
+						--	else
+						--		sort_ptr(wid_int) <= null_ptr;
+						--	end if;
 						when Probe =>
 							-- TODO: only 1 state? Certainly buggy timing
 							-- Decrement pointer
@@ -152,10 +241,10 @@ begin
 								-- Match found in previous step
 								-- Now keep the same address and swap
 								cct_write_address := unsigned(wid) & current_ptr;
-								cct_read_address <= cct_write_address;
+								cct_read_address := cct_write_address;
 								cct(to_integer(cct_write_address)) <= Pack(y_in);
 								y_changed_1 <= '1';
-								
+
 								state(wid_int) <= ResetHead;
 							elsif current_ptr = null_ptr then
 								-- Reached bottom of stack
@@ -163,9 +252,13 @@ begin
 								y_changed_1 <= '0';
 							else
 								-- No match, move on to next cell
+								-- doubtful but seemingly useful, unless current_ptr is capped at the end
+						--		if my_head /= null_ptr then
 								current_ptr := current_ptr - to_unsigned(1, log_warpsize);
+						--		end if;
 								sort_ptr(wid_int) <= current_ptr;
-								cct_read_address <= unsigned(wid) & current_ptr;
+								cct_read_address := unsigned(wid) & current_ptr;
+
 								y_changed_1 <= '0';
 							end if;
 						--when Swap =>
@@ -176,10 +269,32 @@ begin
 						--	state(wid_int) <= ResetHead;
 					end case;
 				end if;
+
+				-- if current_ptr >= my_head then
+				-- 	if my_head = null_ptr then
+				-- 		current_ptr := my_head;
+				-- 	else
+				-- 		current_ptr := my_head - to_unsigned(1, log_warpsize);
+				-- 	end if;
+				-- end if;
+				--
+				-- -- doubtful too
+				-- if cct_read_address >= unsigned(wid) & my_head then
+				-- 	if my_head = null_ptr then
+				-- 		cct_read_address := unsigned(wid) & null_ptr;
+				-- 	else
+				-- 		cct_read_address := unsigned(wid) & my_head - to_unsigned(1, log_warpsize);
+				-- 	end if;
+				-- end if;
+				cct_output <= cct(to_integer(cct_read_address));
+				cct_read_address_sig <= cct_read_address;
+				cct_write_address_sig <= cct_write_address;
+				current_ptr_sig <= current_ptr;
 			end if;
+
 		end if;
 	end process;
-	
+
 	-- Passthrough y if not coming from CCT
 	with y_changed_1 select
 		y_out <= y_1 when '1',
@@ -199,7 +314,7 @@ begin
 				wid_int := to_integer(unsigned(wid_1));
 				if idle_1 = '1' then
 					-- Compare CCT output with HCT y
-					if y_in_1.valid = '1' and y_1.valid = '1'
+					if y_in_1.valid = '1' and y_1.valid = '1' and head(wid_int)(log_warpsize - 1 downto 0) > current_ptr_sig -- null_ptr
 						and (y_1.calldepth > y_in_1.calldepth or y_1.mpc < y_in_1.mpc) then
 						match_found_2(wid_int) <= '1';
 					else

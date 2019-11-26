@@ -31,6 +31,7 @@ architecture behavioral of Simty_Output_Test is
 	constant use_inst_mem : boolean := true;
 	constant use_testio_mem : boolean := true;
 	constant use_arbiter : boolean := true;
+	constant use_unit_tester : boolean := false;
 begin
 	clock <=  '1' after 0.5 ns when clock = '0' else
         '0' after 0.5 ns when clock = '1';
@@ -107,6 +108,14 @@ begin
 				testio_response		=> sig_io_response,
 				scratchpad_request	=> sig_scratch_request,
 				scratchpad_response	=> sig_scratch_response
+			);
+	end generate;
+
+	unit_tester_comp: if use_unit_tester generate
+		u_tester : Unit_Tester
+			port map (
+				clock	=> clock,
+				reset	=> reset
 			);
 	end generate;
 

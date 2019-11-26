@@ -10,11 +10,20 @@ Which is 10 * 64 / 32
 Which is 10 * 2 = 20
 */
 
+#define ARRAY_HEIGHT 1 // should really be 21 to match 31 ARRAY_WIDTH
+//#define ARRAY_HEIGHT 21
+#define ARRAY_WIDTH 31
+#define FXP_RANK 20
+
 
 typedef struct {
 	int a;
 	int b;
 } complex_number ;
+
+const complex_number z0 = {.a = 0, .b = 0};
+const int DIVERGENCE_THRESHOLD = 4 << FXP_RANK; 	// we use the square of the threshold because it's cheaper
+											// and not at all because we lack support for sqrt, no no no that's not the reason
 
 
 static inline int threadId() {
@@ -32,8 +41,47 @@ static inline int mul(int a, int b){
 	return(res);
 }
 
+int fast_mul(int m, int n){
+    long ans = 0;
+	int count = 0;
+	int sign = ( ((m & 0xC0000000) >> 31) ^ (n & 0xC0000000)  >> 31);
+	if(m < 0)
+		m = -m;
+	if(n < 0)
+		n = -n;
 
-complex_number cmul(complex_number x, complex_number y){
+	long add_val;
+    while (m){
+        if ( (m & 1) == 1){
+			add_val = n;
+			add_val = (add_val << count);
+			ans += add_val;
+		}
+        count++;
+        m = m >> 1;
+    }
+	ans = ans >> FXP_RANK;
+	int ians = ans;
+	if(sign == 1)
+		ians = -ians;
+    return ians;
+}
+
+int fast_imul(int m, int n){
+	int count = 0;
+	int res = 0;
+	while(m){
+		if( (m & 1) == 1){
+			res += (n << count);
+		}
+		count++;
+		m = m >> 1;
+	}
+	return(res);
+}
+
+
+static inline complex_number cmul(complex_number x, complex_number y){
 	complex_number res;
 	//xy	= (x.a + x.b*i) * (y.a + y.b *i)
 	//		= x.a*y.a + x.a*y.b*i + x.b*i*y.a + x.b*i*y.b*i
@@ -41,44 +89,73 @@ complex_number cmul(complex_number x, complex_number y){
 	//		= x.a*y.a + x.a*y.b*i + x.b*y.a*i - x.b*y.b
 	//		= x.a*y.a - x.b*y.b + x.a*y.b*i + x.b*y.a*i
 	//		= (x.a*y.a - x.b*y.b) + (x.a*y.b + x.b*y.a)i
-	res.a = mul(x.a, y.a) - mul(x.b, y.b);
-	res.b = mul(x.a, y.b) + mul(x.b, y.a);
+	res.a = fast_mul(x.a, y.a) - fast_mul(x.b, y.b);
+	res.b = fast_mul(x.a, y.b) + fast_mul(x.b, y.a);
+	return(res);
+}
+
+static inline complex_number cadd(complex_number x, complex_number y){
+	complex_number res;
+	res.a = x.a + y.a;
+	res.b = x.b + y.b;
+	return(res);
+}
+
+// Square of the absolute value of a complex number
+static inline int csqabs(complex_number x){
+	return( fast_mul(x.a, x.a) + fast_mul(x.b, x.b) );
+}
+
+int mandelbrotize(complex_number c, int iterations){
+	complex_number acc = z0;
+	int res;
+	for(int i=0; i<iterations; i++){
+		acc = cadd( cmul(acc, acc), c);
+		res = csqabs(acc);
+		if(res > DIVERGENCE_THRESHOLD){
+			return(res);
+		}
+	}
 	return(res);
 }
 
 
-int main()
-{
-//	int* int_array = (int*)0x1000C7C0; // beginning of the scratchpad; the stack's at the end of it
-//	int* int_array = (int*)0x20000000;
-	int* int_array = (int*)0x10001000;
-
-//	int* int_array = (int*)0x20001000; // beginning of the scratchpad; the stack's at the end of it
-//	int fuck = 0;
-	//int int_array[THREAD_COUNT];
-	int tid = threadId();
-	int arrSize = mul(SCREEN_H, SCREEN_W);
-	//int_array[tid] = tid;
-
-	//int_array[tid] = 0;
-
-
-	for(int i=0; i<1024; i++){
-		int_array[i] = 0;
+void array_mandelbrotize(complex_number* carray, int* results, int tid){
+	//complex_number carray[ARRAY_HEIGHT][ARRAY_WIDTH];
+	int real;
+	int imaginary = (1 << FXP_RANK);
+//	int step = 0x660;  // 0.025 if FXP_RANK is 16, size 161 // w / h 121 / 81
+//	int step = 0x6600; // 0.025 if FXP_RANK is 20
+	int step = 0x19800; // 0.1 if FXP_RANK is 20
+	complex_number tmp;
+	for(int i=0; i<ARRAY_HEIGHT; i++){
+		real = -(2 << FXP_RANK);
+		for(int j=tid; j<ARRAY_WIDTH; j+=THREAD_COUNT){
+			carray[fast_imul(i, ARRAY_WIDTH) + j].a = real;
+			carray[fast_imul(i, ARRAY_WIDTH) + j].b = imaginary;
+			real += step;
+		}
+		imaginary -= step;
 	}
 
-
-///*
-	for(int y = 0; y < SCREEN_H; ++y) {
-		for(int x = tid; x < SCREEN_W; x += THREAD_COUNT) {
-			int_array[mul(y,SCREEN_W) + x] += x + y;
-			//int_array[0] += tid;
-			//fuck += tid;
-			//int_array[0] = 0;
-			//int_array[0] = 3;
+	for(int i=0; i<ARRAY_HEIGHT; i++){
+		for(int j=tid; j<ARRAY_WIDTH; j+=THREAD_COUNT){
+			results[fast_imul(i, ARRAY_WIDTH) + j] = mandelbrotize(carray[fast_imul(i, ARRAY_WIDTH) + j], 16);
 		}
 	}
-//*/
+}
+
+int main()
+{
+//	int* int_array = (int*)0x20000000;
+//	int* int_array = (int*)0x10001000;
+	int tid = threadId();
+	complex_number* carray = (complex_number*)0x10001000; // beginning of scratchpad
+	int* results = (int*)0x2000000; // beginning of testio
+
+	array_mandelbrotize(carray, results, tid);
+
+
 
 	return 0;
 

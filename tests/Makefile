@@ -54,7 +54,7 @@ mwp: mwp.o
 
 
 %.hex: %
-	/Users/kouyoumd/spike/riscv-isa-sim/build/elf2hex 4 1024 $< > $@
+	/Users/kouyoumd/spike/riscv-isa-sim/build/elf2hex 4 2048 $< > $@
 #	/Users/kouyoumd/spike/riscv-isa-sim/build/elf2hex 8 256 $< > $@
 
 #	/Users/kouyoumd/elf2hex/elf2hex $< > $@

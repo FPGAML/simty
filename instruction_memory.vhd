@@ -16,7 +16,7 @@ entity Instruction_Memory is
 end entity;
 
 architecture structural of Instruction_Memory is
-	constant rambits : natural := 10;
+	constant rambits : natural := 12;
 	type ram is array(0 to 2**rambits - 1) of instruction_word;
 	constant use_rom : boolean := false;
 
@@ -53,12 +53,12 @@ architecture structural of Instruction_Memory is
 	--signal imem : ram := Read_File("tests/manyCopies.hex");
 	--signal imem : ram := Read_File("tests/writeAndRead.hex");
 	--signal imem : ram := Read_File("tests/fullTest.hex");
-	--signal imem : ram := Read_File("tests/mandelbrot.hex");
+	signal imem : ram := Read_File("tests/mandelbrot.hex");
 	--signal imem : ram := Read_File("tests/fCall.hex");
 	--signal imem : ram := Read_File("tests/mwp.hex");
 	--signal imem : ram := Read_File("tests/invert.hex");
 	--signal imem : ram := Read_File("tests/bytewrites.hex");
-	signal imem : ram := Read_File("tests/switch_colors.hex");
+	--signal imem : ram := Read_File("tests/switch_colors.hex");
 
 
 
