@@ -65,8 +65,15 @@ architecture structural of Convergence_Tracker_CT is
 	signal hct_x_wren_8, hct_y_wren_9 : std_logic;
 	signal invalid_7, invalid_8 : std_logic;
 	signal mpc_7, mpc_8, fallthrough_pc_8 : code_address;
+	signal x7_mpc : code_address;
 	signal calldepth_8 : calldepth_count;
 	signal dump_hct : std_logic;
+
+	signal x8_valid : std_logic;
+	signal x8_mpc : code_address;
+	signal x8_vmask : mask;
+	signal x8_calldepth : calldepth_count;
+
 --	signal zero : std_logic := '0';
 --	signal one : std_logic := '1';
 begin
@@ -135,6 +142,11 @@ begin
 	a_8 <= x_8_when_invalid when invalid_8 = '1' else a_mem_8 when is_mem_8 = '1' else a_branch_8;
 	b_8 <= EmptyPath when invalid_8 = '1' else b_mem_8 when is_mem_8 = '1' else b_branch_8;
 
+
+	x8_valid <= x_8_when_invalid.valid;
+	x8_mpc <= x_8_when_invalid.mpc;
+	x8_vmask <= x_8_when_invalid.vmask;
+	x8_calldepth <= x_8_when_invalid.calldepth;
 	-- Compact and sort contexts
 	ccs : Context_Compact_Sort
 		port map (
@@ -151,6 +163,8 @@ begin
 	nmpc_valid <= is_branch_8 or doreplay_8;
 	nmpc_alive <= x_8.valid;
 	nmpc_wid <= wid_8;
+
+	x7_mpc <= x_7.mpc;
 
 	-- Writeback x_8 in HCT1
 	hct_x_in_8 <= (mpc => init_nextpcs(0), calldepth => (others => '0'), vmask => init_alive_mask, valid => '1') when init = '1'

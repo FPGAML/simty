@@ -28,6 +28,7 @@ end entity;
 architecture structural of Bus_Arbiter is
 	signal msb : std_logic_vector(3 downto 0);
 	signal address_in_request : block_address; -- std_logic_vector(31 downto 4);
+	signal address_in_response : block_address;
 	signal data_in_request : vector;
 	signal data_in_response : vector;
 	signal req_valid : std_logic;
@@ -50,6 +51,7 @@ begin
 	msb <= request.address(31 downto 28);
 --	wtf <= request.address(3 downto 0);
 	address_in_request <= request.address;
+	address_in_response <= response.address;
 --	address_received(31 downto 4) <= request.address(31 downto 4);
 	data_in_request <= request.data;
 	data_in_response <= response.data;

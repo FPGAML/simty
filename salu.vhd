@@ -34,11 +34,15 @@ architecture structural of SALU is
 	signal is_sub : std_logic;
 	signal carry_in : unsigned(0 downto 0);
 	signal z, n, c, v : std_logic;
+	signal overflow : std_logic;
 	signal cond_alu : std_logic;
 	--signal shift_amount : unsigned(4 downto 0);
 	signal funnel_hi, funnel_lo : scalar;
 	signal funnel_shamt : std_logic_vector(4 downto 0);
 	signal funnel_c : std_logic;
+
+	signal twos_comp_b : unsigned(31 downto 0);
+	signal carry_out_raw : std_logic;
 begin
 	is_sub <= '1' when (insn.alu_alt = '1' and insn.alu_ctl = AddSub and insn.b_is_imm = '0') or insn.alu_ctl = Compare else '0';
 	a <= to_scalar(mpc) when insn.a_is_pc = '1' else
@@ -46,24 +50,55 @@ begin
 	bmux <= insn.imm when insn.b_is_imm = '1' else s2;
 	b <= not bmux when is_sub = '1' or insn.alu_ctl = SL else bmux;	-- Negate amount for left shifts, can be immediate
 
+
+
 	carry_in <= "1" when is_sub = '1' else "0";
+--	twos_comp_b <= unsigned(b) + carry_in;
+
 	rwide <= resize(unsigned(a),33) + unsigned(b) + carry_in;
+--	rwide <= resize(unsigned(a),33) + twos_comp_b;
+
 	r_add <= std_logic_vector(rwide(31 downto 0));
+
+
+	-- overflow <= std_logic(rwide(31)) when a(31) = '0' and twos_comp_b(31) = '0' else -- 1 with two positive numbers
+	-- 			not(std_logic(rwide(31))) when a(31) = '1' and twos_comp_b(31) = '1' else -- 0 with two negative numbers
+	-- 			'0'; -- no overflow possible with operands of different signs
+
+	overflow <= std_logic(rwide(31)) when a(31) = '0' and bmux(31) = '1' else -- 1 with two positive numbers
+				not(std_logic(rwide(31))) when a(31) = '1' and bmux(31) = '0' else -- 0 with two negative numbers
+				'0'; -- no overflow possible with operands of different signs
 	indirect_target <= r_add(code_address'high downto code_address'low);
 
 	-- Condition
-	c <= std_logic(rwide(32));
-	n <= r_add(31);
+	c <= std_logic(rwide(32)) xor is_sub;
+	carry_out_raw <= std_logic(rwide(32));
+--	c <= std_logic(rwide(32));-- xor is_sub;
+
+	n <= r_add(31); -- n is the sign bit
 	v <= c xor n;
 	z <= '1' when r_add = (31 downto 0 => '0') else '0';
 	with insn.compop select
-		cond_alu <= z        when EQ,
-		        not z        when NE,
-		        v            when LTU,
-		        n            when LT,
-		        (not n) or z when GE,
-		        (not v) or z when GEU,
-		        '0'          when others;
+		cond_alu <= z								when EQ,
+		        not z								when NE,
+		        c									when LTU,
+				-- carry_out_raw						when LT,
+--		        c and not(overflow)					when LT,
+--				carry_out_raw and not(overflow)		when LT,
+--				n									when LT, -- I think this actually worked. Well, no.
+			--	n and not(overflow)					when LT, -- closer
+			--	n and not(overflow) or not(n) and overflow
+				n xor overflow						when LT, -- YES THAT FUCKING WORKS
+		--      (not c)    							when GEU,
+		--      (not v)								when GE,
+
+			--  Do these two work? Nobody knows.
+		        -- (not c) or z						when GEU,
+		        -- (not c) or z						when GE,
+
+				not c								when GEU,
+				not(n xor overflow)					when GE, -- wtf can't I write n = overflow?
+		        '0'          						when others;
 
 	r_bool <= X"0000_0001" when cond_alu = '1' else (others => '0');
 	cond <= cond_alu;

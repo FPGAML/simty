@@ -3,18 +3,18 @@
 .text
 
 .global main
-# 12 bits for the scratchpad, for block addresses, so the last block would be 100F FF0, so you have to iterate fro; 1000 000 to 100F FF0
-# and on testio, that would be from 2000 000 to 200F FF0
+# 16 bits for the scratchpad for block addresses, so the last block would be 100F FFF-
+# testio addresses start with 2
 
 # Set up regular (non-interleaved) stack frames
 .global _start
 _start:
 csrr a0, mhartid
 #slli t0, a0, LOG_STACK_INTERLEAVING
-slli t0, a0, 0x007
+slli t0, a0, 0x00B
 #la sp, STACK_BASE
-la sp, 0x10000FFC	# last block in the scratchpad
-# 10001000 should be the end of the stack
+la sp, 0x1000FFFC	# last block in the stack
+# 10010000 should be the end of the stack
 
 sub sp, sp, t0
 #jal ra, MAIN_START
@@ -41,6 +41,7 @@ jal ra, main
 # 	blt a3, a2, copyloop
 
 lui a0, 0x2FFFF
+#addi a0, a0, 0x0
 sw zero, 0(a0)
 
 

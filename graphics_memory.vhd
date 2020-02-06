@@ -61,6 +61,9 @@ begin
 				pu_response.wid <= (others => '-');
 				pu_response.address <= (others => '-');
 			else
+				if pu_request.valid = '1' and valid_in_range = '0' then
+					report "VGA request out of range! " & to_string(pu_request.address) severity error;
+				end if;
 				pu_response.valid <= valid_in_range and pu_request.is_read and pu_request.valid;
 				pu_response.wid <= pu_request.wid;
 				pu_response.address <= pu_request.address;

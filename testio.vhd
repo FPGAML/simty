@@ -95,7 +95,7 @@ begin
 					end if;
 				end if;
 
-				if request.valid = '1' and request.address = X"2FFFF00" and request.wid = "111" then
+				if request.valid = '1' and request.address = X"2FFFF00" then --and request.wid = "111" then
 					Write_To_File("result.res");
 				end if;
 			end if;

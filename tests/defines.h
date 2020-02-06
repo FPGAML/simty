@@ -2,7 +2,7 @@
 #define DEFINE_H_INCLUDED
 
 #define THREAD_COUNT	32
-//#define THREAD_COUNT	4
+//#define THREAD_COUNT	1
 
 
 #define LOG_STACK_INTERLEAVING	7

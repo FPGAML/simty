@@ -10,7 +10,7 @@ CFLAGS=-march=rv32i -mabi=ilp32
 
 %.o: %.c
 #	/opt/riscv/bin/riscv32-unknown-elf-gcc -c -m32 $<
-	/opt/riscv/bin/riscv32-unknown-elf-gcc -c $(CFLAGS) $<
+	/opt/riscv/bin/riscv32-unknown-elf-gcc -g -c $(CFLAGS) $<
 
 
 fCall: fCall.o

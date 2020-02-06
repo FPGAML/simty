@@ -2,3 +2,4 @@
 *.vcd
 *.res
 heximage.txt
+dumps/*

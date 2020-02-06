@@ -26,7 +26,9 @@ end entity;
 
 architecture structural of Scratchpad is
 --	constant log_depth : natural := 7;
-	constant log_depth : natural := 16; -- more memory
+--	constant log_depth : natural := 16; -- more memory
+	constant log_depth : natural := 17; -- even more memory
+
 
 	signal rd_address : std_logic_vector(log_depth - 1 downto 0);
 	signal wr_address : std_logic_vector(log_depth - 1 downto 0);
