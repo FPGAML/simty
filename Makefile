@@ -33,7 +33,10 @@ $(VCD): $(PROG)
 #	./simty_output_test --stop-time=40000ns --vcd=$@ # test_comps
 
 #	./simty_output_test --stop-time=24000000ns # 21 lines mandelbrot no vcd
-	./simty_output_test --stop-time=100000000ns # 42 lines mandelbrot no vcd
+
+#	./simty_output_test --stop-time=100000000ns # 42 lines mandelbrot no vcd
+
+	./simty_output_test --stop-time=3000ns --vcd=$@ # stack_test
 
 
 #	./simty_output_test --stop-time=1800000ns # 60 difficult fxp_mul no vcd

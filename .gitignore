@@ -1,5 +1,6 @@
 *.o
 *.vcd
 *.res
+*.csv
 heximage.txt
 dumps/*

@@ -212,42 +212,43 @@ void deep_test_fxpmul(int* results){
 	}
 }
 
-int debug_fxp_mul(int m, int n, int* results){
-	int* allms			= (int*)0x20004000;
-    int64_t ans = 0;
-	int count = 0;
-	int sign = ( ((m & 0xC0000000) >> 31) ^ (n & 0xC0000000)  >> 31);
-	if(m < 0)
-		m = -m;
-	if(n < 0)
-		n = -n;
-	results[0] = sign;
-	results[1] = m;
-	results[2] = n;
-
-	int64_t add_val;
-	int mCount = 0;
-    while (m){
-        if ( (m & 1) == 1){
-			add_val = n;
-			add_val = (add_val << count);
-			ans += add_val;
-		}
-		results[count+3] = (ans >> FXP_RANK) ;
-        count++;
-        m = m >> 1;
-		allms[mCount] = m;
-		mCount++;
-    }
-	count += 8;
-	ans = ans >> FXP_RANK;
-	results[count] = ans;
-	int ians = ans;
-	if(sign == 1)
-		ians = -ians;
-	results[count+1] = ians;
-    return ians;
-}
+// Useful, but long, so commented to avoid going over 2048 instructions
+// int debug_fxp_mul(int m, int n, int* results){
+// 	int* allms			= (int*)0x20004000;
+//     int64_t ans = 0;
+// 	int count = 0;
+// 	int sign = ( ((m & 0xC0000000) >> 31) ^ (n & 0xC0000000)  >> 31);
+// 	if(m < 0)
+// 		m = -m;
+// 	if(n < 0)
+// 		n = -n;
+// 	results[0] = sign;
+// 	results[1] = m;
+// 	results[2] = n;
+//
+// 	int64_t add_val;
+// 	int mCount = 0;
+//     while (m){
+//         if ( (m & 1) == 1){
+// 			add_val = n;
+// 			add_val = (add_val << count);
+// 			ans += add_val;
+// 		}
+// 		results[count+3] = (ans >> FXP_RANK) ;
+//         count++;
+//         m = m >> 1;
+// 		allms[mCount] = m;
+// 		mCount++;
+//     }
+// 	count += 8;
+// 	ans = ans >> FXP_RANK;
+// 	results[count] = ans;
+// 	int ians = ans;
+// 	if(sign == 1)
+// 		ians = -ians;
+// 	results[count+1] = ians;
+//     return ians;
+// }
 
 // void dumb_test(int* results){
 // 	for(int i=0; i<30; i++){
@@ -291,6 +292,19 @@ void thorough_test_comps(int* results){
 	}
 }
 
+void stack_test(int* results){
+	//int test[5] = {10,11,12,13,14};
+	int test[5];
+	test[0] = 10;
+	test[1] = 11;
+	test[2] = 12;
+	test[3] = 13;
+	test[4] = 14;
+	for(int i=0; i<5; i++){
+		results[i] = test[i];
+	}
+}
+
 
 
 int main()
@@ -304,7 +318,9 @@ int main()
 //	int* reals				= (int*)0x20000000;
 //	int* imaginary_values	= (int*)0x20000A30;
 
-	array_mandelbrotize(carray, results, tid);
+//	array_mandelbrotize(carray, results, tid);
+
+	stack_test(results);
 
 //	thorough_test_comps(results);
 
