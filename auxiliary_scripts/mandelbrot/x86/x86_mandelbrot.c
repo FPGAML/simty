@@ -234,25 +234,39 @@ void dump_array_formatted(int* vals, char* fname){
 	}
 }
 
-// TODO: explain this.
+// This is the main function, which does most of the work.
+// It iterates over all pixels and calls mandelbrotize on them, filling an array
+// of "pixels" with ones or zeroes depending on whether they're meant to be
+// black (convergent sequence) or white (divergent sequence).
 void array_mandelbrotize(){
+	// We create an array of complex numbers, this is our complex plane
+	// It must go from -2 to +1 on the real axis, and from -1 to +1 on the
+	// imaginary axis if we want to include the entire set
 	complex_number carray[fast_imul(ARRAY_HEIGHT, ARRAY_WIDTH)];
+	// And these will be our results
 	int results[fast_imul(ARRAY_HEIGHT, ARRAY_WIDTH)];
-	int real;// = (-2 << FXP_RANK);
-	int imaginary = (1 << FXP_RANK);
+	int real;
+	int imaginary = (1 << FXP_RANK); // that's the top
 	int index;
+
+	// The step variable is the size of the increments. It obviously depends on
+	// the size of our carray. Together, the size of carray and step define the
+	// resolution of our fractal image. Ideally they would both depend on a single
+	// variable, but we don't support divisions, so we've just hard-coded this
+	// manually.
 //	int step = 0x6600; // 0.025 if FXP_RANK is 20
 	int step = 0x19800; // 0.1 if FXP_RANK is 20
 //	int step = 0x1980; // if FXP_RANK is 20 and width is 31*16
 //	int step = 0xCC0; // ditto if width is 31*16*2
 	int tmp_res;
 	for(int i=0; i<ARRAY_HEIGHT; i++){
-		real = -(2 << FXP_RANK);
+		real = -(2 << FXP_RANK); // that's the left side of the plane
 		for(int j=0; j<ARRAY_WIDTH; j++){
 			index = fast_imul(i, ARRAY_WIDTH) + j;
 			carray[index].a = real;
 			carray[index].b = imaginary;
 			tmp_res = mandelbrotize(carray[index], 16);
+			// If the result is above the DIVERGENCE_THRESHOLD, the pixel must be white.
 			results[index] = (tmp_res > DIVERGENCE_THRESHOLD)? 1 : 0;
 			real += step;
 		}
