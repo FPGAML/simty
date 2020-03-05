@@ -229,7 +229,7 @@ void dump_array(int* res){
 void dump_array_formatted(int* vals, char* fname){
 	FILE *fp;
 	fp = fopen(fname, "w");
-	for(int i=0; i<ARRAY_HEIGHT*ARRAY_WIDTH - 4; i+=4){
+	for(int i=0; i<ARRAY_HEIGHT*ARRAY_WIDTH; i+=4){
 		fprintf(fp, "%08X%08X%08X%08X\n", vals[i+3], vals[i+2], vals[i+1], vals[i]);
 	}
 }
@@ -255,9 +255,9 @@ void array_mandelbrotize(){
 	// variable, but we don't support divisions, so we've just hard-coded this
 	// manually.
 //	int step = 0x6600; // 0.025 if FXP_RANK is 20
-	int step = 0x19800; // 0.1 if FXP_RANK is 20
+	int step = 0x19800; // 0.1 if FXP_RANK is 20, good if width is 31
 //	int step = 0x1980; // if FXP_RANK is 20 and width is 31*16
-//	int step = 0xCC0; // ditto if width is 31*16*2
+//	int step = 0xCC0; // ditto if width is 31*16*2 = 992
 	int tmp_res;
 	for(int i=0; i<ARRAY_HEIGHT; i++){
 		real = -(2 << FXP_RANK); // that's the left side of the plane
@@ -265,14 +265,16 @@ void array_mandelbrotize(){
 			index = fast_imul(i, ARRAY_WIDTH) + j;
 			carray[index].a = real;
 			carray[index].b = imaginary;
-			tmp_res = mandelbrotize(carray[index], 16);
+			tmp_res = mandelbrotize(carray[index], 16); // 16 is reasonable for low-res work
+//			tmp_res = mandelbrotize(carray[index], 64); // 64 is more appropriate for high-res
 			// If the result is above the DIVERGENCE_THRESHOLD, the pixel must be white.
 			results[index] = (tmp_res > DIVERGENCE_THRESHOLD)? 1 : 0;
 			real += step;
 		}
 		imaginary -= step;
 	}
-	dump_array(results);
+//	dump_array(results);
+	dump_array_formatted(results, "x86_results.res");
 }
 
 // A testing function for fxp_mul
