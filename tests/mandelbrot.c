@@ -307,45 +307,11 @@ void stack_test(int* results){
 
 
 
-int main()
-{
-//	int* int_array = (int*)0x20000000;
-//	int* int_array = (int*)0x10001000;
+int main(){
 	int tid = threadId();
-//	int lol;
 	complex_number* carray = (complex_number*)0x10010000; // beginning of scratchpad
 	int* results			= (int*)0x20000000; // beginning of testio
-//	int* reals				= (int*)0x20000000;
-//	int* imaginary_values	= (int*)0x20000A30;
-
 //	array_mandelbrotize(carray, results, tid);
-
 	stack_test(results);
-
-//	thorough_test_comps(results);
-
-//	test_comps(results);
-//	test_mandel(tid, results);
-//	test_fastimul(tid, results);
-//	test_fxpmul(tid, results);
-	//if(tid == 0){
-	//results[80] = debug_fxp_mul(1 << FXP_RANK, 0 << FXP_RANK, results);
-	//}
-
-//	deep_test_fxpmul(results);
-//	dumb_test(results);
-
-//	results[120] = debug_fxp_mul(0x0011B3CA, 0x002DE715, results);
-
-	// int m = 0x00100000;
-	// int n = 0x00200000;
-	//
-	// int mStep = 0x0001B3CA;
-	// int nStep = 0x000DE715;
-
-	// results[9] = sizeof(int64_t);
-	// results[10] = sizeof(int64_t);
-
 	return 0;
-
 }

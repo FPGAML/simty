@@ -4,7 +4,6 @@ use ieee.numeric_std.all;
 use work.Simty_Pkg.all;
 use std.textio.all;
 
-
 -- 1 read port, 1 write port
 entity Hot_Context_Table is
 	port (
@@ -32,11 +31,11 @@ architecture structural of Hot_Context_Table is
 	signal dump_count : integer := 0;
 
 	-- debugging signals
-	signal entry0, entry1, entry2, entry3, entry4, entry5, entry6, entry7 : entry;
-	signal e7valid : std_logic;
-	signal e7vmask : mask;
-	signal e7mpc : code_address;
-	signal e7cd : calldepth_count;
+	-- signal entry0, entry1, entry2, entry3, entry4, entry5, entry6, entry7 : entry;
+	-- signal e7valid : std_logic;
+	-- signal e7vmask : mask;
+	-- signal e7mpc : code_address;
+	-- signal e7cd : calldepth_count;
 
 	procedure DumpHCT(fname : string ; myram : ram ; wpc : natural) is
 		--variable fname		: string := "hct_dump.txt";
@@ -85,19 +84,19 @@ begin
 			dump_count <= dump_count + 1;
 
 			-- signals purely meant for debugging purposes using chronograms
-			entry0 <= hct(0);
-			entry1 <= hct(1);
-			entry2 <= hct(2);
-			entry3 <= hct(3);
-			entry4 <= hct(4);
-			entry5 <= hct(5);
-			entry6 <= hct(6);
-			entry7 <= hct(7);
-
-			e7valid	<= hct(7)(warpsize);
-			e7vmask	<= hct(7)(warpsize - 1 downto 0);
-			e7mpc	<= hct(7)(warpsize + code_address'length downto warpsize + 1);
-			e7cd	<= hct(7)(warpsize + code_address'length + calldepth_width downto warpsize + code_address'length + 1);
+			-- entry0 <= hct(0);
+			-- entry1 <= hct(1);
+			-- entry2 <= hct(2);
+			-- entry3 <= hct(3);
+			-- entry4 <= hct(4);
+			-- entry5 <= hct(5);
+			-- entry6 <= hct(6);
+			-- entry7 <= hct(7);
+			--
+			-- e7valid	<= hct(7)(warpsize);
+			-- e7vmask	<= hct(7)(warpsize - 1 downto 0);
+			-- e7mpc	<= hct(7)(warpsize + code_address'length downto warpsize + 1);
+			-- e7cd	<= hct(7)(warpsize + code_address'length + calldepth_width downto warpsize + code_address'length + 1);
 			-- end of debugging signals
 
 

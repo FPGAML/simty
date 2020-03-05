@@ -1,3 +1,6 @@
+-- This file containts most of Simty's type definitions, as well as a number
+-- of helper functions used throughout the project.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -822,6 +825,8 @@ package body simty_pkg is
 	end function;
 
 
+	-- This function returns the req argument with its valid bit set to 1 if expr
+	-- is true, and set to 0 if it's false.
 	function set_request(expr : boolean ; req : Bus_Request) return Bus_Request is
 		variable generated_request : Bus_Request;
 	begin
@@ -834,6 +839,10 @@ package body simty_pkg is
 		return generated_request;
 	end function;
 
+
+	-- This returns the reponse whose valid bit is 1. If two or more responses have
+	-- their valid bit set to 1, then the returned response will be invalid, because
+	-- that's not a valid situation.
 	function set_response(vga_resp : Bus_Response ; scratch_resp : Bus_Response ; testio_resp : Bus_Response) return Bus_Response is
 		variable generated_response : Bus_Response;
 	begin

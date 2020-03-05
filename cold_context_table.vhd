@@ -43,17 +43,18 @@ architecture structural of Cold_Context_Table is
 	signal wid_1 : warpid;
 	signal y_changed_1 : std_logic;
 
+	signal current_ptr_sig : cct_ptr;
+
 	-- debugging type
 	subtype path_as_logic_vector is std_logic_vector(log_codesize + warpsize + calldepth_width - 2 downto 0); -- size 43
 
 	-- debugging signals
-	signal command_sig_cct, state_sig : integer;
-	signal head0, head7, current_ptr_sig : cct_ptr;
-	signal entry0, entry1, entry2, entry3, entry4, entry5, entry6,
-	entry7, entry8, entry9, entry10, entry11, entry12, entry13, entry14,
-	entry15, entry16, entry17, entry18, entry19, entry20, entry21, entry22,
-	entry23, entry24, entry25, entry26, entry27, entry28, entry29, entry30, entry31, entry32 : path_as_logic_vector;
-
+	-- signal command_sig_cct, state_sig : integer;
+	-- signal head0, head7 : cct_ptr;
+	-- signal entry0, entry1, entry2, entry3, entry4, entry5, entry6,
+	-- entry7, entry8, entry9, entry10, entry11, entry12, entry13, entry14,
+	-- entry15, entry16, entry17, entry18, entry19, entry20, entry21, entry22,
+	-- entry23, entry24, entry25, entry26, entry27, entry28, entry29, entry30, entry31, entry32 : path_as_logic_vector;
 
 
 	-- debugging functions
@@ -102,48 +103,46 @@ architecture structural of Cold_Context_Table is
 	end function;
 begin
 	idle <= '1' when command = Nop or (command = Pop and head(to_integer(unsigned(wid))) = null_ptr) else '0';
-
-
 	y_1 <= Unpack(cct_output);
 
 
 	-- debugging code
-	command_sig_cct <= 1 when command = Push else 2 when command = Pop else 3 when command = Nop else 4;
-	state_sig <= 1 when state(to_integer(unsigned(wid))) = ResetHead else 2 when state(to_integer(unsigned(wid))) = Probe else 3;
-	head0 <= head(0);
-	head7 <= head(7);
-	entry0 <= Path_To_Logic_Vector(Unpack(cct(0)));
-	entry1 <= Path_To_Logic_Vector(Unpack(cct(1)));
-	entry2 <= Path_To_Logic_Vector(Unpack(cct(2)));
-	entry3 <= Path_To_Logic_Vector(Unpack(cct(3)));
-	entry4 <= Path_To_Logic_Vector(Unpack(cct(4)));
-	entry5 <= Path_To_Logic_Vector(Unpack(cct(5)));
-	entry6 <= Path_To_Logic_Vector(Unpack(cct(6)));
-	entry7 <= Path_To_Logic_Vector(Unpack(cct(7)));
-	entry8 <= Path_To_Logic_Vector(Unpack(cct(8)));
-	entry9 <= Path_To_Logic_Vector(Unpack(cct(9)));
-	entry10 <= Path_To_Logic_Vector(Unpack(cct(10)));
-	entry11 <= Path_To_Logic_Vector(Unpack(cct(11)));
-	entry12 <= Path_To_Logic_Vector(Unpack(cct(12)));
-	entry13 <= Path_To_Logic_Vector(Unpack(cct(13)));
-	entry14 <= Path_To_Logic_Vector(Unpack(cct(14)));
-	entry15 <= Path_To_Logic_Vector(Unpack(cct(15)));
-	entry16 <= Path_To_Logic_Vector(Unpack(cct(16)));
-	entry17 <= Path_To_Logic_Vector(Unpack(cct(17)));
-	entry18 <= Path_To_Logic_Vector(Unpack(cct(18)));
-	entry19 <= Path_To_Logic_Vector(Unpack(cct(19)));
-	entry20 <= Path_To_Logic_Vector(Unpack(cct(20)));
-	entry21 <= Path_To_Logic_Vector(Unpack(cct(21)));
-	entry22 <= Path_To_Logic_Vector(Unpack(cct(22)));
-	entry23 <= Path_To_Logic_Vector(Unpack(cct(23)));
-	entry24 <= Path_To_Logic_Vector(Unpack(cct(24)));
-	entry25 <= Path_To_Logic_Vector(Unpack(cct(25)));
-	entry26 <= Path_To_Logic_Vector(Unpack(cct(26)));
-	entry27 <= Path_To_Logic_Vector(Unpack(cct(27)));
-	entry28 <= Path_To_Logic_Vector(Unpack(cct(28)));
-	entry29 <= Path_To_Logic_Vector(Unpack(cct(29)));
-	entry30 <= Path_To_Logic_Vector(Unpack(cct(30)));
-	entry31 <= Path_To_Logic_Vector(Unpack(cct(31)));
+	-- command_sig_cct <= 1 when command = Push else 2 when command = Pop else 3 when command = Nop else 4;
+	-- state_sig <= 1 when state(to_integer(unsigned(wid))) = ResetHead else 2 when state(to_integer(unsigned(wid))) = Probe else 3;
+	-- head0 <= head(0);
+	-- head7 <= head(7);
+	-- entry0 <= Path_To_Logic_Vector(Unpack(cct(0)));
+	-- entry1 <= Path_To_Logic_Vector(Unpack(cct(1)));
+	-- entry2 <= Path_To_Logic_Vector(Unpack(cct(2)));
+	-- entry3 <= Path_To_Logic_Vector(Unpack(cct(3)));
+	-- entry4 <= Path_To_Logic_Vector(Unpack(cct(4)));
+	-- entry5 <= Path_To_Logic_Vector(Unpack(cct(5)));
+	-- entry6 <= Path_To_Logic_Vector(Unpack(cct(6)));
+	-- entry7 <= Path_To_Logic_Vector(Unpack(cct(7)));
+	-- entry8 <= Path_To_Logic_Vector(Unpack(cct(8)));
+	-- entry9 <= Path_To_Logic_Vector(Unpack(cct(9)));
+	-- entry10 <= Path_To_Logic_Vector(Unpack(cct(10)));
+	-- entry11 <= Path_To_Logic_Vector(Unpack(cct(11)));
+	-- entry12 <= Path_To_Logic_Vector(Unpack(cct(12)));
+	-- entry13 <= Path_To_Logic_Vector(Unpack(cct(13)));
+	-- entry14 <= Path_To_Logic_Vector(Unpack(cct(14)));
+	-- entry15 <= Path_To_Logic_Vector(Unpack(cct(15)));
+	-- entry16 <= Path_To_Logic_Vector(Unpack(cct(16)));
+	-- entry17 <= Path_To_Logic_Vector(Unpack(cct(17)));
+	-- entry18 <= Path_To_Logic_Vector(Unpack(cct(18)));
+	-- entry19 <= Path_To_Logic_Vector(Unpack(cct(19)));
+	-- entry20 <= Path_To_Logic_Vector(Unpack(cct(20)));
+	-- entry21 <= Path_To_Logic_Vector(Unpack(cct(21)));
+	-- entry22 <= Path_To_Logic_Vector(Unpack(cct(22)));
+	-- entry23 <= Path_To_Logic_Vector(Unpack(cct(23)));
+	-- entry24 <= Path_To_Logic_Vector(Unpack(cct(24)));
+	-- entry25 <= Path_To_Logic_Vector(Unpack(cct(25)));
+	-- entry26 <= Path_To_Logic_Vector(Unpack(cct(26)));
+	-- entry27 <= Path_To_Logic_Vector(Unpack(cct(27)));
+	-- entry28 <= Path_To_Logic_Vector(Unpack(cct(28)));
+	-- entry29 <= Path_To_Logic_Vector(Unpack(cct(29)));
+	-- entry30 <= Path_To_Logic_Vector(Unpack(cct(30)));
+	-- entry31 <= Path_To_Logic_Vector(Unpack(cct(31)));
 
 
 
@@ -179,12 +178,6 @@ begin
 				if idle = '0' then
 					case command is
 						when Pop =>
-							--if my_head = null_ptr then
-								-- Ignore or do bookkeeping on another warp
-								-- Cannot as missing y_in :(
-								--y_changed_1 <= '0';
-							--else
-							-- Decrement head first
 							my_head := my_head - to_unsigned(1, log_warpsize);
 							cct_read_address := unsigned(wid) & my_head;
 							head(wid_int) <= my_head;
@@ -192,7 +185,6 @@ begin
 							if current_ptr >= my_head then
 								state(wid_int) <= ResetHead;
 							end if;
-							--end if;
 						when Push =>
 							-- Assumes the CCT never overflows
 							-- Write z first
@@ -203,36 +195,21 @@ begin
 							my_head := my_head + to_unsigned(1, log_warpsize);
 							head(wid_int) <= my_head;
 							y_changed_1 <= '0';
-						--when others =>
-							-- Bookkeeping on this warp: sort
-							-- May swap y_(in/out) and CCT head or any CCT entry of the warp
-						--	y_changed_1 <= '0';
 						when others =>
 							null;
 					end case;
-					--if state(wid_int) = Swap then
-					--	-- abort
-					--	if sort_ptr(wid_int) = null_ptr then
-					--		state(wid_int) <= ResetHead;
-					--	else
-					--		state(wid_int) <= Probe;
-					--	end if;
 				else	-- idle = '1'
 					-- CCT sideband sorter state machine
 					case state(wid_int) is
 						when ResetHead =>
-						--	if head(wid_int) /= null_ptr then
-								-- Not strictly necessary state, makes initialization and control logic easier
-								current_ptr := head(wid_int) - to_unsigned(1, log_warpsize);
-								sort_ptr(wid_int) <= current_ptr;
-								cct_read_address := unsigned(wid) & current_ptr;
-								y_changed_1 <= '0';
-								if current_ptr /= null_ptr then
-									state(wid_int) <= Probe;
-								end if;
-						--	else
-						--		sort_ptr(wid_int) <= null_ptr;
-						--	end if;
+							-- Not strictly necessary state, makes initialization and control logic easier
+							current_ptr := head(wid_int) - to_unsigned(1, log_warpsize);
+							sort_ptr(wid_int) <= current_ptr;
+							cct_read_address := unsigned(wid) & current_ptr;
+							y_changed_1 <= '0';
+							if current_ptr /= null_ptr then
+								state(wid_int) <= Probe;
+							end if;
 						when Probe =>
 							-- TODO: only 1 state? Certainly buggy timing
 							-- Decrement pointer
@@ -252,40 +229,13 @@ begin
 								y_changed_1 <= '0';
 							else
 								-- No match, move on to next cell
-								-- doubtful but seemingly useful, unless current_ptr is capped at the end
-						--		if my_head /= null_ptr then
 								current_ptr := current_ptr - to_unsigned(1, log_warpsize);
-						--		end if;
 								sort_ptr(wid_int) <= current_ptr;
 								cct_read_address := unsigned(wid) & current_ptr;
-
 								y_changed_1 <= '0';
 							end if;
-						--when Swap =>
-						--	cct_write_address := unsigned(wid) & current_ptr;
-						--	cct_read_address <= cct_write_address;
-						--	cct(to_integer(cct_write_address)) <= Pack(y_in);
-						--	y_changed_1 <= '1';
-						--	state(wid_int) <= ResetHead;
 					end case;
 				end if;
-
-				-- if current_ptr >= my_head then
-				-- 	if my_head = null_ptr then
-				-- 		current_ptr := my_head;
-				-- 	else
-				-- 		current_ptr := my_head - to_unsigned(1, log_warpsize);
-				-- 	end if;
-				-- end if;
-				--
-				-- -- doubtful too
-				-- if cct_read_address >= unsigned(wid) & my_head then
-				-- 	if my_head = null_ptr then
-				-- 		cct_read_address := unsigned(wid) & null_ptr;
-				-- 	else
-				-- 		cct_read_address := unsigned(wid) & my_head - to_unsigned(1, log_warpsize);
-				-- 	end if;
-				-- end if;
 				cct_output <= cct(to_integer(cct_read_address));
 				cct_read_address_sig <= cct_read_address;
 				cct_write_address_sig <= cct_write_address;
