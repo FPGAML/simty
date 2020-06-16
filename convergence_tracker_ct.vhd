@@ -53,7 +53,7 @@ end entity;
 
 architecture structural of Convergence_Tracker_CT is
 	signal active_mask_7, active_mask_8 : mask;
-	signal a_8, b_8, a_branch_8, b_branch_8, a_mem_8, b_mem_8, c_8, x_7, x_8, y_8, z_8, y_9 : Path;
+	signal a_8, b_8, a_branch_8, b_branch_8, a_mem_8, b_mem_8, c_8, x_7, x_8, y_8, z_8, y_9, x_8_when_invalid : Path;
 	signal wid_7, wid_9 : warpid;
 	signal memory_default_mask_8 : mask;
 	signal replay_pc_8 : code_address;
@@ -77,10 +77,12 @@ begin
 				calldepth_8 <= (others => '0');
 				mpc_7 <= (others => '0');
 				wid_7 <= (others => '0');
+				x_8_when_invalid <= EmptyPath;
 			else
 				mpc_8 <= mpc_7;
 				active_mask_8 <= active_mask_7;
 				invalid_8 <= invalid_7;
+				x_8_when_invalid <= x_7;
 				calldepth_8 <= x_7.calldepth;
 				mpc_7 <= mpc_6;
 				wid_7 <= wid_6;
@@ -127,8 +129,8 @@ begin
 	            calldepth => calldepth_8,			-- No change
 	            vmask => memory_replay_mask_8);
 
-	a_8 <= a_mem_8 when is_mem_8 = '1' else a_branch_8;
-	b_8 <= b_mem_8 when is_mem_8 = '1' else b_branch_8;
+	a_8 <= x_8_when_invalid when invalid_8 = '1' else a_mem_8 when is_mem_8 = '1' else a_branch_8;
+	b_8 <= EmptyPath when invalid_8 = '1' else b_mem_8 when is_mem_8 = '1' else b_branch_8;
 	
 	-- Compact and sort contexts
 	ccs : Context_Compact_Sort

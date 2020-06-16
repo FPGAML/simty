@@ -13,6 +13,8 @@ entity Gather is
 
 		address : in block_address;
 		data_block : in vector;
+
+		-- Valid mask is the mask from the memory request
 		valid_mask : in mask;
 		leader_offset : in std_logic_vector(log_blocksize - 1 downto 0);
 		broadcast_mask : in mask;
