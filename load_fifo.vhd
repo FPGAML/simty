@@ -44,23 +44,27 @@ begin
 				valid_1 <= '0';
 				rd_1 <= (others => '0');
 			else
-				if pop_ack = '1' then
-					valid_1 <= '0';
-				end if;
+				--if pop_ack = '1' then
+				--	valid_1 <= '0';
+				--end if;
+				valid_1 <= push_valid;
 				if push_valid = '1' then
 					data_1 <= push_data;
 					mask_1 <= push_mask;
 					wid_1 <= push_wid;
 					rd_1 <= push_rd;
-					valid_1 <= '1';
+					--valid_1 <= '1';
+				end if;
+				if push_full = '1' then
+					report "load_fifo: overflow!!!" severity error;
 				end if;
 			end if;
 		end if;
 	end process;
-	pop_valid <= valid_1;
-	pop_wid <= wid_1;
-	pop_data <= data_1;
-	pop_mask <= mask_1;
-	pop_rd <= rd_1;
+	pop_valid <= (valid_1 and not pop_ack) or push_valid;
+	pop_wid <= wid_1 when valid_1 = '1' and pop_ack = '0' else push_wid;
+	pop_data <= data_1 when valid_1 = '1' and pop_ack = '0' else push_data;
+	pop_mask <= mask_1 when valid_1 = '1' and pop_ack = '0' else push_mask;
+	pop_rd <= rd_1 when valid_1 = '1' and pop_ack = '0' else push_rd;
 	push_full <= valid_1 and not pop_ack;
 end architecture;
