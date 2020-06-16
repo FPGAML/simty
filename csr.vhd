@@ -38,5 +38,5 @@ begin
 		hartid(32 * i + log_warpsize - 1 downto 32 * i) <= std_logic_vector(to_unsigned(i, log_warpsize));
 	end generate;
 	
-	csr <= hartid when insn.sysop = CSRR and csrid = X"F10" else (others => '0');
+	csr <= hartid when insn.sysop = CSRR and (csrid = X"F14" or csrid = X"F10") else (others => '0');
 end architecture;
