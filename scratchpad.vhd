@@ -34,8 +34,9 @@ architecture structural of Scratchpad is
 begin
 	rd_address <= request.address(log_depth + log_blocksize - 1 downto log_blocksize);
 	wr_address <= rd_address;
-	wr_enable <= request.is_write;
-	is_load_0 <= request.is_read;
+	wr_enable <= request.is_write and request.valid;
+	is_load_0 <= request.is_read and request.valid;
+
 	subarrays : SRAM
 		generic map (
 			width => 32 * warpsize,
