@@ -1,3 +1,6 @@
+-- This file containts most of Simty's type definitions, as well as a number
+-- of helper functions used throughout the project.
+
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
@@ -90,6 +93,8 @@ package simty_pkg is
 		vmask : mask;
 		calldepth : calldepth_count;
 	end record;
+	constant EmptyPath : Path := (valid => '0', mpc => (others => '0'), vmask => (others => '0'), calldepth => (others => '0')); -- arrow direction feels backward
+
 	type CCT_Command is (Push, Pop, Nop);
 
 	type ICache_Request is record

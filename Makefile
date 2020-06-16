@@ -1,4 +1,4 @@
-GHDL=~/usr/ghdl/bin/ghdl
+GHDL=ghdl
 PROG=simty_test
 VCD=$(addsuffix .vcd,$(PROG))
 
