@@ -36,12 +36,13 @@ architecture structural of Cold_Context_Table is
 	type sorter_state_vector is array (0 to warpcount - 1) of sorter_state;
 	signal state : sorter_state_vector;
 	signal sort_ptr : pointer_vector;
-	signal cct_read_address : unsigned(log_warpcount + log_warpsize - 1 downto 0);
 	signal cct_output : cct_entry;
 	signal y_1, y_in_1 : Path;
 	signal match_found_2 : std_logic_vector(warpcount - 1 downto 0);
 	signal wid_1 : warpid;
 	signal y_changed_1 : std_logic;
+
+	signal current_ptr_sig : cct_ptr;
 	
 	function Pack(c : Path) return cct_entry is
 		variable e : cct_entry;
@@ -62,8 +63,6 @@ architecture structural of Cold_Context_Table is
 	end function;
 begin
 	idle <= '1' when command = Nop or (command = Pop and head(to_integer(unsigned(wid))) = null_ptr) else '0';
-
-	cct_output <= cct(to_integer(cct_read_address));
 	y_1 <= Unpack(cct_output);
 	
 	-- Stage 0->1
@@ -77,8 +76,9 @@ begin
 	process(clock)
 		variable wid_int : integer;
 		variable my_head : cct_ptr;
-		variable cct_write_address : unsigned(log_warpcount + log_warpsize - 1 downto 0);
-		variable current_ptr : cct_ptr;
+		variable cct_write_address : unsigned(log_warpcount + log_warpsize - 1 downto 0) := (others => '0');
+		variable cct_read_address : unsigned(log_warpcount + log_warpsize - 1 downto 0) := (others => '0');
+		variable current_ptr : cct_ptr := null_ptr;
 		variable current_entry : Path;
 	begin
 		if rising_edge(clock) then
@@ -90,24 +90,20 @@ begin
 					head(i) <= null_ptr;
 				end loop;
 				state <= (others => ResetHead);
-				cct_read_address <= (others => '0');
+				--cct_read_address <= (others => '0');
 			else
 				wid_int := to_integer(unsigned(wid));
 				my_head := head(wid_int);
 				if idle = '0' then
 					case command is
 						when Pop =>
-							--if my_head = null_ptr then
-								-- Ignore or do bookkeeping on another warp
-								-- Cannot as missing y_in :(
-								--y_changed_1 <= '0';
-							--else
-							-- Decrement head first
 							my_head := my_head - to_unsigned(1, log_warpsize);
-							cct_read_address <= unsigned(wid) & my_head;
+							cct_read_address := unsigned(wid) & my_head;
 							head(wid_int) <= my_head;
 							y_changed_1 <= '1';
-							--end if;
+							if current_ptr >= my_head then
+								state(wid_int) <= ResetHead;
+							end if;
 						when Push =>
 							-- Assumes the CCT never overflows
 							-- Write z first
@@ -118,20 +114,9 @@ begin
 							my_head := my_head + to_unsigned(1, log_warpsize);
 							head(wid_int) <= my_head;
 							y_changed_1 <= '0';
-						--when others =>
-							-- Bookkeeping on this warp: sort
-							-- May swap y_(in/out) and CCT head or any CCT entry of the warp
-						--	y_changed_1 <= '0';
 						when others =>
 							null;
 					end case;
-					--if state(wid_int) = Swap then
-					--	-- abort
-					--	if sort_ptr(wid_int) = null_ptr then
-					--		state(wid_int) <= ResetHead;
-					--	else
-					--		state(wid_int) <= Probe;
-					--	end if;
 				else	-- idle = '1'
 					-- CCT sideband sorter state machine
 					case state(wid_int) is
@@ -139,7 +124,7 @@ begin
 							-- Not strictly necessary state, makes initialization and control logic easier
 							current_ptr := head(wid_int) - to_unsigned(1, log_warpsize);
 							sort_ptr(wid_int) <= current_ptr;
-							cct_read_address <= unsigned(wid) & current_ptr;
+							cct_read_address := unsigned(wid) & current_ptr;
 							y_changed_1 <= '0';
 							if current_ptr /= null_ptr then
 								state(wid_int) <= Probe;
@@ -152,7 +137,7 @@ begin
 								-- Match found in previous step
 								-- Now keep the same address and swap
 								cct_write_address := unsigned(wid) & current_ptr;
-								cct_read_address <= cct_write_address;
+								cct_read_address := cct_write_address;
 								cct(to_integer(cct_write_address)) <= Pack(y_in);
 								y_changed_1 <= '1';
 								
@@ -165,17 +150,12 @@ begin
 								-- No match, move on to next cell
 								current_ptr := current_ptr - to_unsigned(1, log_warpsize);
 								sort_ptr(wid_int) <= current_ptr;
-								cct_read_address <= unsigned(wid) & current_ptr;
+								cct_read_address := unsigned(wid) & current_ptr;
 								y_changed_1 <= '0';
 							end if;
-						--when Swap =>
-						--	cct_write_address := unsigned(wid) & current_ptr;
-						--	cct_read_address <= cct_write_address;
-						--	cct(to_integer(cct_write_address)) <= Pack(y_in);
-						--	y_changed_1 <= '1';
-						--	state(wid_int) <= ResetHead;
 					end case;
 				end if;
+				cct_output <= cct(to_integer(cct_read_address));
 			end if;
 		end if;
 	end process;
@@ -199,7 +179,7 @@ begin
 				wid_int := to_integer(unsigned(wid_1));
 				if idle_1 = '1' then
 					-- Compare CCT output with HCT y
-					if y_in_1.valid = '1' and y_1.valid = '1'
+					if y_in_1.valid = '1' and y_1.valid = '1' and head(wid_int)(log_warpsize - 1 downto 0) > current_ptr_sig -- null_ptr
 						and (y_1.calldepth > y_in_1.calldepth or y_1.mpc < y_in_1.mpc) then
 						match_found_2(wid_int) <= '1';
 					else
