@@ -75,7 +75,7 @@ architecture structural of Simty is
 	signal memwriteback_9, memwriteback_10, memwriteback_11 : vector;
 	signal memwriteback_valid_9, memwriteback_valid_10, memwriteback_valid_11 : std_logic;
 	signal memwriteback_wid_9, memwriteback_wid_10, memwriteback_wid_11 : warpid;
-	signal write_mask_8, write_mask_9, write_mask_10, write_mask_11 : mask;
+	signal valid_mask_8, write_mask_8, write_mask_9, write_mask_10, write_mask_11 : mask;
 	signal memwriteback_ack_5 : std_logic;
 	signal memwriteback_rd_11 : register_id;
 	--signal ldxb_control_8, ldxb_control_9 : std_logic_vector(warpsize * (log_blocksize - 2) - 1 downto 0);
@@ -341,11 +341,13 @@ begin
 		if rising_edge(clock) then
 			if reset = '1' then
 				mmio_out_0 <= (others => '0');
+				valid_mask_8 <= (others => '0'); -- EmptyMask
 			else
 				if request_8.valid = '1' and request_8.is_write = '1' and request_8.address = (31 downto log_blocksize => '0') then
 					mmio_out_0 <= request_8.data(31 downto 0);
 				end if;
 				mmio_in_0 <= mmio_in;
+				valid_mask_8 <= context_7.vmask;
 			end if;
 		end if;
 	end process;
@@ -361,7 +363,7 @@ begin
 	
 	-- Assumes synchronous single-cycle memory!
 	-- TODO store info in MSHRs for asynchronous memories
-	write_mask_8 <= request_8.write_mask;
+	write_mask_8 <= valid_mask_8 and not replay_mask_8;--request_8.write_mask;
 	mem_address_8 <= request_8.address;
 	process(clock) is
 	begin
