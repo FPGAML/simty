@@ -78,7 +78,7 @@ begin
 	              '1' when y_valid = '1' and y_bank = '1' else
 	              '-';
 
-	y_conflict <= '1' when (a_valid and b_valid) = '1' and a_bank = b_bank else '0';
+	y_conflict <= '1' when (x_valid and y_valid) = '1' and x_bank = y_bank else '0';
 
 	-- Read address mux
 	bank0_rdaddr <= b_addr when bank0_rmux = '1' else a_addr;
