@@ -33,7 +33,7 @@ entity Collect is
 		memwriteback_wid : in warpid;
 		memwriteback_rd : in register_id;
 		memwriteback_mask : in mask;
-		memwriteback_ack : out std_logic;
+		memwriteback_ack : out std_logic; -- collector ready / available
 		
 		s1 : out vector;
 		s2 : out vector;
@@ -53,7 +53,7 @@ architecture structural of Collect is
 	signal memwriteback_addr : rfbank_address;
 	--signal writeback_byteenable : std_logic_vector(warpsize * 4 - 1 downto 0);
 	signal enable_writeback, enable_memwriteback : std_logic;
-	signal memwriteback_nack : std_logic;
+	signal memwriteback_11, memwriteback_nack : std_logic;
 	signal a_1, a_byp_1, a_2 : vector;
 	signal b_2 : vector;
 	signal a_addr0, b_addr1 : rfbank_address;
@@ -150,7 +150,16 @@ begin
 			y_wordenable => memwriteback_mask,
 			y_conflict => memwriteback_nack);
 
+	process(clock) is
+	begin
+		if rising_edge(clock) then
+			--memwriteback_11 <= memwriteback_valid;
 	memwriteback_ack <= memwriteback_valid and not memwriteback_nack;
+		end if;
+	end process;
+--	memwriteback_ack <= memwriteback_valid and not memwriteback_nack;
+
+
 	
 	-- TODO: Combinatorial bypass from writeback_d to a_1, a_2, b_2
 
